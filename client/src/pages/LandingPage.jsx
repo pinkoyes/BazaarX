@@ -8,7 +8,7 @@ const LandingPage = () => {
       <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-yellow-400 rounded-full opacity-30 animate-pulseSlow delay-500"></div>
 
       {/* Hero content */}
-      <div className="relative bottom-18 z-10 text-center px-6 md:px-12">
+      <div className="relative bottom-20 z-10 text-center px-6 md:px-12">
         <h1 className="text-5xl md:text-7xl font-extrabold text-white mb-6 leading-tight animate-fadeIn">
           Discover, <span className="text-yellow-400">Buy</span> &{" "}
           <span className="text-yellow-400">Sell</span> Effortlessly
