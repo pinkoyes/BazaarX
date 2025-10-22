@@ -1,89 +1,97 @@
-import React from "react";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import {
+  Menu,
+  Home,
+  Package,
+  ShoppingCart,
+  User,
+  Settings,
+  LogIn,
+} from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-import { X, Home, Package, PlusCircle, LogOut } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { useTheme } from "@/context/ThemeContext";
+import { Button } from "@/components/ui/button";
 
-const Sidebar = ({ isOpen, onClose }) => {
+const Sidebar = () => {
   const location = useLocation();
-  const { theme } = useTheme();
 
-  const links = [
-    { to: "/", icon: <Home size={22} />, label: "Home" },
-    {
-      to: "/seller-dashboard",
-      icon: <Package size={22} />,
-      label: "Dashboard",
-    },
-    {
-      to: "/add-product",
-      icon: <PlusCircle size={22} />,
-      label: "Add Product",
-    },
+  const navLinks = [
+    { to: "/home", label: "Home", icon: Home },
+    { to: "/products", label: "Products", icon: Package },
+    { to: "/orders", label: "Orders", icon: ShoppingCart },
+    { to: "/profile", label: "Profile", icon: User },
+  ];
+
+  const themes = [
+    { name: "Light", value: "light" },
+    { name: "Dark", value: "dark" },
+    { name: "Blue", value: "blue" },
+    { name: "Green", value: "green" },
   ];
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          {/* Overlay */}
-          <motion.div
-            className="fixed inset-0 bg-black/40 z-40"
-            onClick={onClose}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          />
+    <Sheet>
+      {/* Menu Trigger */}
+      <SheetTrigger asChild>
+        <Menu className="w-7 h-7 text-gray-700 dark:text-gray-200" />
+      </SheetTrigger>
 
-          {/* Sidebar */}
-          <motion.aside
-            className={`fixed top-0 right-0 h-full w-[300px] bg-white dark:bg-black z-50 shadow-lg flex flex-col`}
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ type: "tween", duration: 0.3 }}
-          >
-            {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b dark:border-gray-700">
-              <h2 className="text-xl font-semibold text-green-700 dark:text-green-400">
-                Menu
-              </h2>
-              <button
-                onClick={onClose}
-                className="p-1 text-gray-700 dark:text-gray-200"
+      {/* Sheet Content */}
+      <SheetContent
+        side="right"
+        className="w-68 flex flex-col px-6 pb-8 bg-white dark:bg-gray-950"
+      >
+        {/* Header */}
+        <SheetHeader className="text-left">
+          <SheetTitle className="text-2xl font-bold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            OpenDesk
+          </SheetTitle>
+          <p className="border-b-2 py-1"></p>
+          <SheetDescription className="text-sm text-gray-500 dark:text-gray-400"></SheetDescription>
+        </SheetHeader>
+
+        {/* Navigation Links */}
+        <nav className="flex-1 space-y-2">
+          {navLinks.map((link) => {
+            const isActive = location.pathname === link.to;
+            const Icon = link.icon;
+
+            return (
+              <Link
+                key={link.label}
+                to={link.to}
+                className={`flex items-center gap-3 px-3 py-3 rounded-lg text-base font-medium transition-all ${
+                  isActive
+                    ? "bg-linear-to-r from-blue-50 to-blue-100 text-blue-700 border border-blue-200 dark:from-blue-950 dark:to-blue-900 dark:text-blue-300 dark:border-blue-800"
+                    : "text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800"
+                }`}
               >
-                <X size={24} />
-              </button>
-            </div>
+                <Icon className="h-5 w-5" />
+                {link.label}
+              </Link>
+            );
+          })}
+        </nav>
 
-            {/* Navigation Links */}
-            <nav className="flex flex-col p-4 gap-4">
-              {links.map((link) => (
-                <Link
-                  key={link.to}
-                  to={link.to}
-                  onClick={onClose}
-                  className={`flex items-center gap-3 px-3 py-3 rounded-lg text-gray-700 dark:text-gray-200 transition ${
-                    location.pathname === link.to
-                      ? "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-400 font-medium"
-                      : "hover:bg-gray-100 dark:hover:bg-gray-800"
-                  }`}
-                >
-                  {link.icon}
-                  <span className="text-lg">{link.label}</span>
-                </Link>
-              ))}
-
-              {/* Logout */}
-              <button className="flex items-center gap-3 px-3 py-3 text-gray-700 dark:text-gray-200 hover:bg-red-100 dark:hover:bg-red-900 hover:text-red-700 dark:hover:text-red-400 rounded-lg transition mt-4">
-                <LogOut size={22} />
-                Logout
-              </button>
-            </nav>
-          </motion.aside>
-        </>
-      )}
-    </AnimatePresence>
+        {/* Bottom Buttons */}
+        <div className="space-y-3 pt-4 border-t border-gray-200 dark:border-gray-800">
+          <Button className="w-full gap-2 bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+            <LogIn className="h-4 w-4" />
+            Login
+          </Button>
+          <Button variant="outline" className="w-full gap-2">
+            <Settings className="h-4 w-4" />
+            Settings
+          </Button>
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 };
 
