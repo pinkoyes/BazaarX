@@ -3,6 +3,22 @@
 
 @custom-variant dark (&:is(.dark *));
 
+:root {
+  transition-property: background-color, color;
+  transition-duration: 300ms;
+  transition-timing-function: ease-in-out;
+}
+
+html.dark {
+  transition-property: background-color, color;
+  transition-duration: 300ms;
+  transition-timing-function: ease-in-out;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
