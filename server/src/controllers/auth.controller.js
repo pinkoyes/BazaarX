@@ -17,7 +17,6 @@ const cookieOptions = {
 };
 
 export const RegisterUser = asyncHandler(async (req, res) => {
-  console.log(req.body);
   const parseData = registerSchema.safeParse(req.body);
   if (!parseData.success) {
     const errors = parseData.error.issues.map((issue) => ({
@@ -29,7 +28,6 @@ export const RegisterUser = asyncHandler(async (req, res) => {
   }
 
   const { fullName, email, phoneNumber, password } = parseData.data;
-  console.log(parseData.data);
 
   const query = {};
   if (email) query.email = email;
