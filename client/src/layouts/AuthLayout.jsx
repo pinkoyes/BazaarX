@@ -2,9 +2,9 @@ import { Outlet, Link } from "react-router-dom";
 
 const AuthLayout = () => {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-linear-to-br from-indigo-50 via-blue-50 to-purple-50">
+    <div className="min-h-screen flex flex-col items-center justify-center p-2 md:p-4 bg-linear-to-br from-indigo-50 via-blue-50 to-purple-50">
       {/* Card wrapper */}
-      <div className="w-full max-w-md bg-white shadow-xl rounded-xl p-6">
+      <div className="w-full max-w-md bg-white shadow-xl rounded-xl p-4 md:p-7">
         <Outlet />
       </div>
 

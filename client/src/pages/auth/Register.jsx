@@ -2,39 +2,45 @@ import React, { useState } from "react";
 import Input from "../../components/ui/Input";
 import { FcGoogle } from "react-icons/fc";
 import { Link } from "react-router-dom";
+import { validateRegisterField } from "../../utils/helper/validate";
+import { registerSchema } from "../../utils/validations/auth.validation";
+import { z } from "zod";
 
 const Register = () => {
   const [formData, setFormData] = useState({
     fullName: "",
-    emailOrPhone: "",
+    contact: "",
     password: "",
   });
 
   const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
 
-  const validate = () => {
-    const newErrors = {};
-    if (!formData.fullName.trim()) newErrors.fullName = "Full Name is required";
-    if (!formData.emailOrPhone.trim())
-      newErrors.emailOrPhone = "Email or Phone number is required";
-    if (!formData.password.trim()) newErrors.password = "Password is required";
-    return newErrors;
+    const errMsg = validateRegisterField(name, value);
+    setErrors((prev) => ({ ...prev, [name]: errMsg }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const validationErrors = validate();
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
 
-    console.log("Register data:", formData);
-    // TODO: integrate backend registration API
+    try {
+      const { data } = registerSchema.safeParse(formData);
+
+      const isEmail = z.email().safeParse(data.contact).success;
+
+      const payload = {
+        fullName: data.fullName,
+        password: data.password,
+        ...(isEmail ? { email: data.contact } : { phoneNumber: data.contact }),
+      };
+
+      console.log("Payload to send:", payload);
+    } catch (err) {
+      console.log("error");
+    }
   };
 
   const handleGoogleAuth = () => {
@@ -60,11 +66,11 @@ const Register = () => {
         />
 
         <Input
-          name="emailOrPhone"
+          name="contact"
           placeholder="Email or Phone Number"
-          value={formData.emailOrPhone}
+          value={formData.contact}
           onChange={handleChange}
-          error={errors.emailOrPhone}
+          error={errors.contact}
           required
         />
 
