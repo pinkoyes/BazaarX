@@ -3,6 +3,9 @@ import RootLayout from "./layouts/RootLayout";
 import LandingPage from "./pages/LandingPage";
 import Home from "./pages/Home";
 import ErrorPage from "./pages/ErrorPage";
+import AuthLayout from "./layouts/AuthLayout";
+import Login from "./pages/auth/Login";
+import Register from "./pages/auth/Register";
 
 const router = createBrowserRouter([
   {
@@ -17,6 +20,20 @@ const router = createBrowserRouter([
       {
         path: "home",
         element: <Home />,
+      },
+    ],
+  },
+  {
+    path: "/auth",
+    element: <AuthLayout />,
+    children: [
+      {
+        path: "login",
+        element: <Login />,
+      },
+      {
+        path: "register",
+        element: <Register />,
       },
     ],
   },

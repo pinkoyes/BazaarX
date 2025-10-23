@@ -19,7 +19,7 @@ const LandingPage = () => {
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4 animate-fadeIn delay-400">
           <Link
-            to="/register"
+            to="/auth/register"
             className="bg-yellow-400 text-gray-900 font-semibold px-8 py-3 rounded-lg shadow-xl hover:bg-yellow-500 transition-all duration-300"
           >
             Get Started

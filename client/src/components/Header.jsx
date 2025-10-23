@@ -10,7 +10,7 @@ const Header = () => {
           <img
             src="https://i.pinimg.com/736x/2b/7f/9e/2b7f9eddd519169ca29481f370667a52.jpg"
             alt="logo"
-            className="w-12 h-12 md:w-14 md:h-14 object-cover rounded-full hover:scale-110 transition-transform duration-300"
+            className="w-12 h-12 md:w-14 md:h-14 object-cover rounded-full hover:scale-140 transition-transform duration-300"
           />
           <Link
             to="/"
@@ -23,15 +23,15 @@ const Header = () => {
         {/* Right side - Desktop links */}
         <div className="hidden md:flex items-center space-x-12">
           <Link
-            to="/login"
+            to="/auth/login"
             className="relative text-gray-700 font-medium transition-all duration-200
-            after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[2px] 
+            after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-0 after:h-0.5 
             after:bg-blue-500 after:transition-all after:duration-300 hover:after:w-full text-[1.2rem]"
           >
             Login
           </Link>
           <Link
-            to="/register"
+            to="/auth/register"
             className="px-5 py-2.5 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg shadow-lg transition-all duration-300 text-[1.1rem]"
           >
             Register
