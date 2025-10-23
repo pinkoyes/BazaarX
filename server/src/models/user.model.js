@@ -82,14 +82,14 @@ userSchema.pre("save", async function (next) {
 userSchema.methods.generateAccessToken = function () {
   return jwt.sign(
     { _id: this._id, role: this.role },
-    process.env.TOKEN_SECRET,
+    process.env.JWT_ACCESS_SECRET,
     { expiresIn: "2d" }
   );
 };
 
 // generate refreshToken
 userSchema.methods.generateRefreshToken = function () {
-  return jwt.sign({ _id: this._id }, process.env.TOKEN_SECRET, {
+  return jwt.sign({ _id: this._id }, process.env.JWT_REFRESH_SECRET, {
     expiresIn: "2d",
   });
 };
@@ -98,10 +98,5 @@ userSchema.methods.generateRefreshToken = function () {
 userSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
-
-// indexes
-userSchema.index({ email: 1 }, { sparse: true, unique: true });
-userSchema.index({ phoneNumber: 1 }, { sparse: true, unique: true });
-userSchema.index({ googleId: 1 }, { sparse: true, unique: true });
 
 export const User = mongoose.model("User", userSchema);
