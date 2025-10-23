@@ -7,11 +7,16 @@ export const registerSchema = z.object({
   contact: z
     .string()
     .min(3, "Email or Phone number is required")
-    .refine((val) => {
+    .refine(
+      (val) => z.email().safeParse(val).success || phoneRegex.test(val),
+      "Invalid email or phone number"
+    )
+    .transform((val) => {
       const isEmail = z.email().safeParse(val).success;
-      const isPhone = phoneRegex.test(val);
-      return isEmail || isPhone;
-    }, "Invalid email or phone number"),
+      return isEmail
+        ? { type: "email", value: val }
+        : { type: "phone", value: val };
+    }),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
@@ -19,10 +24,15 @@ export const loginSchema = z.object({
   contact: z
     .string()
     .min(1, "Email or Phone number is required")
-    .refine((val) => {
+    .refine(
+      (val) => z.email().safeParse(val).success || phoneRegex.test(val),
+      "Invalid email or phone number"
+    )
+    .transform((val) => {
       const isEmail = z.email().safeParse(val).success;
-      const isPhone = phoneRegex.test(val);
-      return isEmail || isPhone;
-    }, "Invalid email or phone number"),
+      return isEmail
+        ? { type: "email", value: val }
+        : { type: "phoneNumber", value: val };
+    }),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });

@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
 import { RxHamburgerMenu } from "react-icons/rx";
+import { useAuth } from "../context/AuthContext";
 
 const Header = () => {
+  const { user, logoutUser } = useAuth();
   return (
     <header className="w-full fixed top-0 left-0 z-50 bg-white shadow-md h-16 md:h-20">
       <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between h-full">
@@ -21,22 +23,32 @@ const Header = () => {
         </div>
 
         {/* Right side - Desktop links */}
-        <div className="hidden md:flex items-center space-x-12">
-          <Link
-            to="/auth/login"
-            className="relative text-gray-700 font-medium transition-all duration-200
+        {user ? (
+          <button
+            onClick={() => {
+              logoutUser();
+            }}
+          >
+            Logout
+          </button>
+        ) : (
+          <div className="hidden md:flex items-center space-x-12">
+            <Link
+              to="/auth/login"
+              className="relative text-gray-700 font-medium transition-all duration-200
             after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-0 after:h-0.5 
             after:bg-blue-500 after:transition-all after:duration-300 hover:after:w-full text-[1.2rem]"
-          >
-            Login
-          </Link>
-          <Link
-            to="/auth/register"
-            className="px-5 py-2.5 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg shadow-lg transition-all duration-300 text-[1.1rem]"
-          >
-            Register
-          </Link>
-        </div>
+            >
+              Login
+            </Link>
+            <Link
+              to="/auth/register"
+              className="px-5 py-2.5 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg shadow-lg transition-all duration-300 text-[1.1rem]"
+            >
+              Register
+            </Link>
+          </div>
+        )}
 
         {/* Mobile Hamburger */}
         <div className="md:hidden">

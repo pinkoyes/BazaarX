@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import Input from "../../components/ui/Input";
 import { FcGoogle } from "react-icons/fc";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { validateRegisterField } from "../../utils/helper/validate";
 import { registerSchema } from "../../utils/validations/auth.validation";
-import { z } from "zod";
+import { useAuth } from "../../context/AuthContext";
+import toast from "react-hot-toast";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -14,6 +15,8 @@ const Register = () => {
   });
 
   const [errors, setErrors] = useState({});
+  const { registerUser, loading } = useAuth();
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -23,24 +26,33 @@ const Register = () => {
     setErrors((prev) => ({ ...prev, [name]: errMsg }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       const { data } = registerSchema.safeParse(formData);
 
-      const isEmail = z.email().safeParse(data.contact).success;
-
       const payload = {
         fullName: data.fullName,
         password: data.password,
-        ...(isEmail ? { email: data.contact } : { phoneNumber: data.contact }),
+        ...(data.contact.type === "email"
+          ? { email: data.contact.value }
+          : { phoneNumber: data.contact.value }),
       };
 
       console.log("Payload to send:", payload);
+      const { success } = await registerUser(payload);
+      if (success) navigate("/home");
+      toast.success("Registration successfull!");
     } catch (err) {
-      console.log("error");
+      toast.error("Registration failed");
     }
+
+    setFormData({
+      fullName: "",
+      contact: "",
+      password: "",
+    });
   };
 
   const handleGoogleAuth = () => {

@@ -1,18 +1,20 @@
 import React, { useState } from "react";
 import Input from "../../components/ui/Input";
 import { FcGoogle } from "react-icons/fc";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { validateLoginField } from "../../utils/helper/validate";
 import { loginSchema } from "../../utils/validations/auth.validation";
-import { z } from "zod";
+import toast from "react-hot-toast";
+import { useAuth } from "../../context/AuthContext";
 
 const Login = () => {
   const [formData, setFormData] = useState({
     contact: "",
     password: "",
   });
-
+  const { loginUser, loading } = useAuth();
   const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -21,29 +23,28 @@ const Login = () => {
     setErrors((prev) => ({ ...prev, [name]: errMsg }));
   };
 
-  const validate = () => {
-    const newErrors = {};
-    if (!formData.emailOrPhone.trim())
-      newErrors.emailOrPhone = "Email or Phone number is required";
-    if (!formData.password.trim()) newErrors.password = "Password is required";
-    return newErrors;
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       const { data } = loginSchema.safeParse(formData);
-      const isEmail = z.email().safeParse(data.contact).success;
 
       const payload = {
         password: data.password,
-        ...(isEmail ? { email: data.contact } : { phoneNumber: data.contact }),
+        ...(data.contact.type === "email"
+          ? { email: data.contact.value }
+          : { phoneNumber: data.contact.value }),
       };
 
-      console.log("paylod", payload);
+      const { success } = await loginUser(payload);
+      if (success) navigate("/home");
+      toast.success("Login successfully!");
+      setFormData({
+        contact: "",
+        password: "",
+      });
     } catch (error) {
-      console.log("Error!");
+      toast.error("Try again!");
     }
   };
 
