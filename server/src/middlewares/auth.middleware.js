@@ -2,16 +2,16 @@ import jwt from "jsonwebtoken";
 import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 
-export const protect = async (req, res, next) => {
+export const protect = async (req, _, next) => {
   try {
     let token;
-    if (req.cookies && req.cookies.accessToken) {
-      token = req.cookies.accessToken;
+    if (req.cookies && req.cookies.token) {
+      token = req.cookies.token;
     }
     if (!token) {
       throw new ApiError(401, "Not authorized, token missing");
     }
-    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     const user = await User.findById(decoded?._id);
     if (!user) {

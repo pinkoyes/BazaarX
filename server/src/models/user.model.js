@@ -58,9 +58,6 @@ const userSchema = new mongoose.Schema(
     profileImage: {
       type: String,
     },
-    refreshToken: {
-      type: String,
-    },
   },
   { timestamps: true }
 );
@@ -71,25 +68,17 @@ userSchema.pre("save", async function (next) {
     return next();
   try {
     const salt = await bcrypt.genSalt(10);
-    this.password = bcrypt.hash(this.password, salt);
+    this.password = await bcrypt.hash(this.password, salt);
+    console.log(this.password);
     next();
   } catch (error) {
     next(error);
   }
 });
 
-// generate accessToken
-userSchema.methods.generateAccessToken = function () {
-  return jwt.sign(
-    { _id: this._id, role: this.role },
-    process.env.JWT_ACCESS_SECRET,
-    { expiresIn: "2d" }
-  );
-};
-
-// generate refreshToken
-userSchema.methods.generateRefreshToken = function () {
-  return jwt.sign({ _id: this._id }, process.env.JWT_REFRESH_SECRET, {
+// generate token
+userSchema.methods.generateToken = function () {
+  return jwt.sign({ _id: this._id, role: this.role }, process.env.JWT_SECRET, {
     expiresIn: "2d",
   });
 };

@@ -6,25 +6,18 @@ import {
   registerSchema,
   loginSchema,
 } from "../utils/validations/auth.validation.js";
-import jwt from "jsonwebtoken";
 
 const isProduction = process.env.NODE_ENV === "production";
 
-const accessTokenOptions = {
+const cookieOptions = {
   httpOnly: true,
   secure: isProduction,
-  sameSite: isProduction ? "none" : "lax",
-  maxAge: 2 * 24 * 60 * 60 * 1000,
-};
-
-const refreshTokenOptions = {
-  httpOnly: true,
-  secure: isProduction,
-  sameSite: isProduction ? "none" : "lax",
-  maxAge: 7 * 24 * 60 * 60 * 1000,
+  sameSite: isProduction ? "noen" : "lax",
+  maxAge: 1 * 24 * 60 * 60 * 1000,
 };
 
 export const RegisterUser = asyncHandler(async (req, res) => {
+  console.log(req.body);
   const parseData = registerSchema.safeParse(req.body);
   if (!parseData.success) {
     const errors = parseData.error.issues.map((issue) => ({
@@ -36,6 +29,7 @@ export const RegisterUser = asyncHandler(async (req, res) => {
   }
 
   const { fullName, email, phoneNumber, password } = parseData.data;
+  console.log(parseData.data);
 
   const query = {};
   if (email) query.email = email;
@@ -49,15 +43,11 @@ export const RegisterUser = asyncHandler(async (req, res) => {
 
   const newUser = await User.create({ fullName, email, phoneNumber, password });
 
-  const accessToken = newUser.generateAccessToken();
-  const refreshToken = newUser.generateRefreshToken();
-  newUser.refreshToken = refreshToken;
-  await newUser.save();
+  const token = newUser.generateToken();
 
   return res
     .status(201)
-    .cookie("accessToken", accessToken, accessTokenOptions)
-    .cookie("refreshToken", refreshToken, refreshTokenOptions)
+    .cookie("token", token, cookieOptions)
     .json(
       new ApiResponse(
         201,
@@ -71,8 +61,7 @@ export const RegisterUser = asyncHandler(async (req, res) => {
             authProvider: newUser.authProvider,
             profileImage: newUser.profileImage,
           },
-          accessToken,
-          refreshToken,
+          token,
         },
         "User created successfully!"
       )
@@ -97,7 +86,7 @@ export const LoginUser = asyncHandler(async (req, res) => {
   if (email) query.email = email;
   if (phoneNumber) query.phoneNumber = phoneNumber;
 
-  const userExist = await User.findOne(query);
+  const userExist = await User.findOne(query).select("+password");
 
   if (!userExist) {
     throw new ApiError(404, "User not exist with given credentials");
@@ -109,15 +98,11 @@ export const LoginUser = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Invalid password");
   }
 
-  const accessToken = userExist.generateAccessToken();
-  const refreshToken = userExist.generateRefreshToken();
-  userExist.refreshToken = refreshToken;
-  await userExist.save();
+  const token = userExist.generateToken();
 
   return res
     .status(200)
-    .cookie("accessToken", accessToken, accessTokenOptions)
-    .cookie("refreshToken", refreshToken, refreshTokenOptions)
+    .cookie("token", token, cookieOptions)
     .json(
       new ApiResponse(
         200,
@@ -131,8 +116,7 @@ export const LoginUser = asyncHandler(async (req, res) => {
             authProvider: userExist.authProvider,
             profileImage: userExist.profileImage,
           },
-          accessToken,
-          refreshToken,
+          token,
         },
         "User login successfully!"
       )
@@ -140,36 +124,32 @@ export const LoginUser = asyncHandler(async (req, res) => {
 });
 
 export const LogoutUser = asyncHandler(async (req, res) => {
-  const user = req.user;
-  const updateUser = await User.findByIdAndUpdate(
-    user?._id,
-    { $unset: { refreshToken: 1 } },
-    { new: true }
-  );
-
   return res
     .status(200)
-    .clearCookie("accessToken", { ...accessTokenOptions, maxAge: 0 })
-    .clearCookie("refreshToken", { ...refreshTokenOptions, maxAge: 0 })
-    .json(new ApiResponse(200, {}, "User Logout Successfully!"));
+    .clearCookie("token", { ...cookieOptions, maxAge: 0 })
+    .json(new ApiResponse(200, {}, "Logout successfully!"));
 });
 
-export const RefreshToken = asyncHandler(async (req, res) => {
-  const { refreshToken } = req.cookies;
-  if (!refreshToken) throw new ApiError(401, "No refresh token found");
+export const CurrentUser = asyncHandler(async (req, res) => {
+  const user = req.user;
 
-  const user = await User.findOne({ refreshToken });
-  if (!user) throw new ApiError(401, "Invalid refresh token");
+  if (!user) {
+    throw new ApiError(401, "Unauthorized user!");
+  }
 
-  jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
-
-  const accessToken = user.generateAccessToken();
-  const newRefreshToken = user.generateRefreshToken();
-  user.refreshToken = newRefreshToken;
-  await user.save();
-
-  return res
-    .cookie("accessToken", accessToken, accessTokenOptions)
-    .cookie("refreshToken", newRefreshToken, refreshTokenOptions)
-    .json({ accessToken, refreshToken: newRefreshToken });
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        user: {
+          _id: user._id,
+          fullName: user.fullName,
+          email: user.email,
+          phoneNumber: user.phoneNumber,
+          role: user.role,
+        },
+      },
+      "Fetch current user!"
+    )
+  );
 });
