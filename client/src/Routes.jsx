@@ -7,6 +7,9 @@ import AuthLayout from "./layouts/AuthLayout";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import CreateProduct from "./pages/product/CreateProduct";
+import SellerDashboard from "./pages/dashboard/SellerDashboard";
+import ViewProduct from "./pages/product/ViewProduct";
+import UpdateProduct from "./pages/product/UpdateProduct";
 
 const router = createBrowserRouter([
   {
@@ -23,8 +26,20 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       {
+        path: "seller-dashboard",
+        element: <SellerDashboard />,
+      },
+      {
         path: "product/create",
         element: <CreateProduct />,
+      },
+      {
+        path: "product/:id",
+        element: <ViewProduct />,
+      },
+      {
+        path: "edit-product/:id",
+        element: <UpdateProduct />,
       },
     ],
   },

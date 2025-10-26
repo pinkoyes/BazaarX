@@ -22,6 +22,30 @@ const Header = () => {
           </Link>
         </div>
 
+        {/* navigation */}
+        {user?.role === "user" && (
+          <div className="hidden lg:flex space-x-8">
+            <Link
+              to="/seller-dashboard"
+              className="text-gray-700 font-medium hover:text-blue-600 transition-colors duration-300"
+            >
+              Seller Dashboard
+            </Link>
+            <Link
+              to="/sell-product"
+              className="text-gray-700 font-medium hover:text-blue-600 transition-colors duration-300"
+            >
+              My Orders
+            </Link>
+            <Link
+              to="/my-orders"
+              className="text-gray-700 font-medium hover:text-blue-600 transition-colors duration-300"
+            >
+              Cart
+            </Link>
+          </div>
+        )}
+
         {/* Right side - Desktop links */}
         {user ? (
           <button

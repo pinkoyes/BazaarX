@@ -14,6 +14,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await currentUser();
       setUser(res?.data?.user);
+      localStorage.setItem("user", JSON.stringify(res?.data?.user));
     } catch (error) {
       setUser(null);
       // toast.error("Failed to fetch current user info!");
@@ -29,6 +30,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await register(data);
       setUser(res?.data?.user);
+      localStorage.setItem("user", JSON.stringify(res?.data?.user));
       setLoading(false);
       return { success: true };
     } catch (error) {
@@ -42,6 +44,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await login(data);
       console.log(res);
+      localStorage.setItem("user", JSON.stringify(res?.data?.user));
       setUser(res?.data?.user);
       setLoading(false);
       return { success: true };
@@ -55,6 +58,7 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       await logout();
+      localStorage.removeItem("user");
     } catch (error) {
       toast.error("Try again!");
     } finally {

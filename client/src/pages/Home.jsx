@@ -7,7 +7,7 @@ const categories = [
   },
   {
     name: "Furniture",
-    img: "https://images.unsplash.com/photo-1582582494700-1d69c8e4d9a9",
+    img: "https://italica.com/cdn/shop/articles/05.png?v=1668071361",
   },
   {
     name: "Fashion",
