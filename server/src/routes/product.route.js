@@ -7,10 +7,11 @@ import {
   updateProduct,
   deleteProduct,
 } from "../controllers/product.controller.js";
+import { upload } from "../middlewares/multer.middleware.js";
 
 const router = express.Router();
 
-router.post("/", protect, createProduct);
+router.post("/", protect, upload.array("media", 5), createProduct);
 router.get("/", protect, getProducts);
 router.get("/:id", protect, getProductById);
 router.patch("/:id", protect, updateProduct);

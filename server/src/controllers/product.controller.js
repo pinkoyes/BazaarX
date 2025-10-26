@@ -6,13 +6,34 @@ import {
   createProductSchema,
   updateProductSchema,
 } from "../utils/validations/product.validation.js";
+import { uploadToCloudinary, deleteFromCloudinary } from "../utils/helper.js";
 
 export const createProduct = asyncHandler(async (req, res) => {
   const ownerId = req.user?._id;
-  const productData = { ...req.body, ownerId };
+  let uploadedFiles = [];
+
+  if (req.files && req.files.length > 0) {
+    uploadedFiles = await Promise.all(
+      req.files.map(async (file) => {
+        const result = await uploadToCloudinary(file);
+        return {
+          url: result.secure_url,
+          type: result.resource_type,
+          public_id: result.public_id,
+        };
+      })
+    );
+  }
+
+  const productData = { ...req.body, ownerId, media: uploadedFiles };
+
+  console.log(productData);
 
   const validateProductData = createProductSchema.safeParse(productData);
   if (!validateProductData.success) {
+    await Promise.all(
+      uploadedFiles.map((f) => deleteFromCloudinary(f.public_id, f.type))
+    );
     const errors = validateProductData.error.issues.map((issue) => ({
       field: issue.path[0],
       message: issue.message,

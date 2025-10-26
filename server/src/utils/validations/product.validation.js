@@ -2,7 +2,7 @@ import { z } from "zod";
 import mongoose from "mongoose";
 
 const objectId = z
-  .string()
+  .instanceof(mongoose.Types.ObjectId)
   .refine((val) => mongoose.Types.ObjectId.isValid(val), {
     message: "Invalid ownerId",
   });
@@ -27,7 +27,7 @@ export const createProductSchema = z.object({
   media: z
     .array(
       z.object({
-        url: z.string().url("Media must be a valid URL"),
+        url: z.url("Media must be a valid URL"),
         type: z.enum(["image", "video"]),
       })
     )
