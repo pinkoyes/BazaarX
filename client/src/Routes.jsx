@@ -6,6 +6,7 @@ import ErrorPage from "./pages/ErrorPage";
 import AuthLayout from "./layouts/AuthLayout";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
+import CreateProduct from "./pages/product/CreateProduct";
 
 const router = createBrowserRouter([
   {
@@ -20,6 +21,10 @@ const router = createBrowserRouter([
       {
         path: "home",
         element: <Home />,
+      },
+      {
+        path: "product/create",
+        element: <CreateProduct />,
       },
     ],
   },

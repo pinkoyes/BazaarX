@@ -16,7 +16,7 @@ const Header = () => {
           />
           <Link
             to="/"
-            className="hidden md:block text-3xl font-bold text-blue-600"
+            className="hidden md:block text-3xl font-bold text-blue-600 hover:text-blue-700"
           >
             AgoraX
           </Link>
@@ -28,6 +28,7 @@ const Header = () => {
             onClick={() => {
               logoutUser();
             }}
+            className="bg-gray-300 px-4 py-2 rounded-md cursor-pointer text-[1rem]"
           >
             Logout
           </button>

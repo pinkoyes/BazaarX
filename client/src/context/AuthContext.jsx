@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
       setUser(res?.data?.user);
     } catch (error) {
       setUser(null);
-      toast.error("Failed to fetch current user info!");
+      // toast.error("Failed to fetch current user info!");
     }
   };
 

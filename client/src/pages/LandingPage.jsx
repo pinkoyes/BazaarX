@@ -1,6 +1,13 @@
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const LandingPage = () => {
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  if (isAuthenticated) {
+    navigate("/home");
+  }
   return (
     <div className="relative w-full h-screen bg-linear-to-br from-indigo-600 via-purple-600 to-pink-500 overflow-hidden flex items-center justify-center">
       {/* Floating abstract shapes */}
