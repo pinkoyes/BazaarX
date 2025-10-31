@@ -58,7 +58,6 @@ export const getProducts = asyncHandler(async (req, res) => {
 export const getProductById = asyncHandler(async (req, res) => {
   const productId = req.params?.id;
   if (!productId) throw new ApiError(400, "No product id found");
-  console.log(productId);
   const product = await Product.findById(productId).populate(
     "ownerId",
     "fullName email"
@@ -133,4 +132,39 @@ export const fetchUserProducts = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(new ApiResponse(200, products, "Fetch products successfully!"));
+});
+
+export const productsForHomePage = asyncHandler(async (req, res) => {
+  const products = await Product.find().limit(6);
+  if (!products) {
+    throw new ApiError(404, "Products not found.");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, products, "Fetch prodcts data for home page!"));
+});
+
+export const productByCategory = asyncHandler(async (req, res) => {
+  const { category } = req.query;
+
+  if (!category) {
+    throw new ApiError(400, "category doesn't exist");
+  }
+
+  const products = await Product.find(category);
+
+  if (!products) {
+    throw new ApiError(404, "Products with this category not found.");
+  }
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        products,
+        "Fetch product based on category successfully!"
+      )
+    );
 });
