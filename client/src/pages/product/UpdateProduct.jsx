@@ -22,14 +22,14 @@ const UpdateProduct = () => {
   const getProduct = async () => {
     setLoading(true);
     try {
-      const res = await fetchProductById(id);
+      const data = await fetchProductById(id);
       setForm({
-        title: res.data.title,
-        description: res.data.description,
-        category: res.data.category,
-        price: res.data.price,
-        location: res.data.location,
-        available: res.data.available,
+        title: data.title,
+        description: data.description,
+        category: data.category,
+        price: data.price,
+        location: data.location,
+        available: data.available,
       });
     } catch (err) {
       console.error(err);
@@ -68,43 +68,40 @@ const UpdateProduct = () => {
 
   if (loading)
     return (
-      <div className="flex justify-center items-center h-screen text-lg font-medium">
+      <div className="flex justify-center items-center h-screen text-lg font-medium text-gray-600">
         Loading product details...
       </div>
     );
 
   return (
-    <div className="max-w-7xl my-6 mx-auto px-6 py-10">
-      {/* Back to Dashboard */}
-      <div className="flex justify-between items-center mb-8">
+    <div className="min-h-screen bg-gray-50 py-10 px-5 md:px-12">
+      {/* Header */}
+      <div className="max-w-7xl mx-auto mb-8 flex items-center justify-between">
         <Link
           to="/seller-dashboard"
-          className="flex items-center gap-2 mb-2 text-blue-600 hover:text-blue-800 transition-all font-medium"
+          className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-all font-medium"
         >
-          <FiArrowLeft /> Back to Dashboard
+          <FiArrowLeft className="text-lg" /> Back to Dashboard
         </Link>
       </div>
 
-      {/* Form Container */}
-      <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
-        <form
-          onSubmit={handleSubmit}
-          className="grid grid-cols-1 md:grid-cols-2 gap-10 p-8"
-        >
-          {/* LEFT SECTION */}
-          <div className="flex flex-col justify-between">
-            <div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-4">
-                Update Product
-              </h1>
-              <p className="text-gray-600 text-base mb-8">
-                Make changes to your product details below and click save to
-                update them instantly.
-              </p>
+      {/* Main Form Container */}
+      <div className="max-w-7xl mx-auto bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden">
+        <div className="flex flex-col md:flex-row">
+          {/* LEFT SIDE */}
+          <div className="w-full md:w-1/2 bg-linear-to-b from-gray-50 to-white p-8 md:p-10 border-b md:border-b-0 md:border-r border-gray-100">
+            <h1 className="text-3xl font-bold text-gray-900 mb-3">
+              Update Product
+            </h1>
+            <p className="text-gray-600 text-sm mb-10">
+              Update your product information below. All changes will reflect
+              instantly after saving.
+            </p>
 
-              {/* Title */}
-              <div className="mb-5">
-                <label className="font-medium text-gray-700 mb-2 block">
+            {/* FORM FIELDS */}
+            <div className="space-y-6">
+              <div>
+                <label className="text-gray-700 font-medium mb-2 block">
                   Title
                 </label>
                 <input
@@ -112,15 +109,14 @@ const UpdateProduct = () => {
                   name="title"
                   value={form.title}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                  className="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
                   placeholder="Enter product title"
                   required
                 />
               </div>
 
-              {/* Category */}
-              <div className="mb-5">
-                <label className="font-medium text-gray-700 mb-2 block">
+              <div>
+                <label className="text-gray-700 font-medium mb-2 block">
                   Category
                 </label>
                 <input
@@ -128,15 +124,14 @@ const UpdateProduct = () => {
                   name="category"
                   value={form.category}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                  className="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
                   placeholder="Enter category"
                   required
                 />
               </div>
 
-              {/* Price */}
-              <div className="mb-5">
-                <label className="font-medium text-gray-700 mb-2 block">
+              <div>
+                <label className="text-gray-700 font-medium mb-2 block">
                   Price (₹)
                 </label>
                 <input
@@ -144,15 +139,14 @@ const UpdateProduct = () => {
                   name="price"
                   value={form.price}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                  placeholder="Enter price"
+                  className="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                  placeholder="Enter price in INR"
                   required
                 />
               </div>
 
-              {/* Location */}
-              <div className="mb-5">
-                <label className="font-medium text-gray-700 mb-2 block">
+              <div>
+                <label className="text-gray-700 font-medium mb-2 block">
                   Location
                 </label>
                 <input
@@ -160,14 +154,13 @@ const UpdateProduct = () => {
                   name="location"
                   value={form.location}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                  className="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
                   placeholder="Enter location"
                   required
                 />
               </div>
 
-              {/* Availability */}
-              <div className="flex items-center gap-3 mt-3">
+              <div className="flex items-center gap-3 mt-4">
                 <input
                   type="checkbox"
                   name="available"
@@ -182,35 +175,37 @@ const UpdateProduct = () => {
             </div>
           </div>
 
-          {/* RIGHT SECTION */}
-          <div className="flex flex-col justify-between">
+          {/* RIGHT SIDE */}
+          <div className="w-full md:w-1/2 p-8 md:p-10 bg-gray-50 flex flex-col justify-between">
             <div>
-              <label className="font-medium text-gray-700 mb-2 block">
+              <label className="text-gray-700 font-medium mb-2 block">
                 Description
               </label>
               <textarea
                 name="description"
                 value={form.description}
                 onChange={handleChange}
-                rows="8"
-                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all resize-none"
-                placeholder="Write a short description..."
+                rows="10"
+                className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all resize-none bg-white"
+                placeholder="Write a detailed description..."
                 required
               ></textarea>
             </div>
 
             {/* Save Button */}
-            <div className="mt-8 flex justify-end">
+            <div className="mt-10 flex justify-end">
               <button
                 type="submit"
                 disabled={loading}
-                className="flex items-center justify-center gap-2 bg-blue-600 text-white font-semibold px-8 py-3 rounded-lg shadow-md hover:bg-blue-700 transition-all duration-200 disabled:opacity-60"
+                onClick={handleSubmit}
+                className="flex items-center justify-center gap-2 bg-blue-600 text-white font-semibold px-8 py-3.5 rounded-xl shadow-md hover:bg-blue-700 hover:shadow-lg transition-all duration-200 disabled:opacity-60"
               >
-                <FiSave /> {loading ? "Saving..." : "Save Changes"}
+                <FiSave className="text-lg" />{" "}
+                {loading ? "Saving..." : "Save Changes"}
               </button>
             </div>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );

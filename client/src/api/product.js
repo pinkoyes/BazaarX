@@ -7,8 +7,10 @@ export const createProduct = async (data) => {
 };
 
 export const fetchUserProducts = async (userId) => {
+  console.log(userId);
   const res = await api.get(`/product/user/${userId}`);
-  return res.data;
+  console.log(res);
+  return res.data?.data;
 };
 
 export const deleteProductById = async (productId) => {

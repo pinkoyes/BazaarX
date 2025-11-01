@@ -1,6 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
-import { AiOutlineClose } from "react-icons/ai";
+import { AiOutlineClose, AiOutlineUpload } from "react-icons/ai";
 import toast from "react-hot-toast";
 import { createProduct } from "../../api/product";
 
@@ -18,6 +17,7 @@ const CreateProduct = () => {
   const [preview, setPreview] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  // Handle input changes
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setForm({
@@ -26,43 +26,35 @@ const CreateProduct = () => {
     });
   };
 
-  // Handle media file selection + preview generation
+  // Handle media uploads
   const handleMediaChange = (e) => {
     const files = Array.from(e.target.files);
-
-    const newPreviews = files.map((file) => {
-      const type = file.type.startsWith("video") ? "video" : "image";
-      return {
-        url: URL.createObjectURL(file),
-        type,
-      };
-    });
+    const newPreviews = files.map((file) => ({
+      url: URL.createObjectURL(file),
+      type: file.type.startsWith("video") ? "video" : "image",
+    }));
 
     setMediaFiles((prev) => [...prev, ...files]);
     setPreview((prev) => [...prev, ...newPreviews]);
   };
 
-  // Delete specific media preview
   const handleDeleteMedia = (index) => {
     setPreview((prev) => prev.filter((_, i) => i !== index));
     setMediaFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Submit the form
+  // Submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       setLoading(true);
       const formData = new FormData();
-
       Object.keys(form).forEach((key) => formData.append(key, form[key]));
       mediaFiles.forEach((file) => formData.append("media", file));
 
-      console.log(formData);
-
       await createProduct(formData);
+      toast.success("✅ Product added successfully!");
 
-      toast.success("Product add successfully!");
       setForm({
         title: "",
         description: "",
@@ -75,39 +67,45 @@ const CreateProduct = () => {
       setPreview([]);
     } catch (error) {
       console.error(error);
-      toast.error("Failed to create product. Try again!");
+      toast.error("❌ Failed to create product. Try again!");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex justify-center items-center p-2 md:p-6">
-      <div className="bg-white w-full max-w-2xl shadow-xl rounded-2xl p-5 md:p-8">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
-          Create New Product
-        </h2>
+    <div className="min-h-screen bg-linear-to-b from-gray-50 to-gray-100 flex items-center justify-center px-4 py-8">
+      <div className="bg-white w-full max-w-3xl rounded-2xl shadow-2xl p-6 md:p-10 transition-all duration-300 hover:shadow-3xl">
+        {/* Header */}
+        <div className="text-center mb-10">
+          <h2 className="text-3xl font-extrabold text-gray-800">
+            🛒 Create New Product
+          </h2>
+          <p className="text-gray-500 mt-2 text-sm sm:text-base">
+            Fill in the details below to list your product for sale.
+          </p>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {/* Title */}
           <div>
-            <label className="block text-gray-600 mb-2 font-medium">
-              Title
+            <label className="block text-gray-700 mb-2 font-medium">
+              Product Title
             </label>
             <input
               type="text"
               name="title"
               value={form.title}
               onChange={handleChange}
-              placeholder="Enter product title"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+              placeholder="Enter a catchy product name"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
               required
             />
           </div>
 
           {/* Description */}
           <div>
-            <label className="block text-gray-600 mb-2 font-medium">
+            <label className="block text-gray-700 mb-2 font-medium">
               Description
             </label>
             <textarea
@@ -115,15 +113,15 @@ const CreateProduct = () => {
               value={form.description}
               onChange={handleChange}
               rows={4}
-              placeholder="Describe your product"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+              placeholder="Describe your product in detail"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none resize-none transition-all"
             />
           </div>
 
-          {/* Category and Price */}
-          <div className="grid grid-cols-2 gap-4">
+          {/* Category & Price */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-gray-600 mb-2 font-medium">
+              <label className="block text-gray-700 mb-2 font-medium">
                 Category
               </label>
               <input
@@ -131,14 +129,14 @@ const CreateProduct = () => {
                 name="category"
                 value={form.category}
                 onChange={handleChange}
-                placeholder="e.g. Electronics"
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                placeholder="e.g. Electronics, Furniture"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-gray-600 mb-2 font-medium">
+              <label className="block text-gray-700 mb-2 font-medium">
                 Price (₹)
               </label>
               <input
@@ -146,8 +144,8 @@ const CreateProduct = () => {
                 name="price"
                 value={form.price}
                 onChange={handleChange}
-                placeholder="Enter price"
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                placeholder="Enter product price"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                 required
               />
             </div>
@@ -155,7 +153,7 @@ const CreateProduct = () => {
 
           {/* Location */}
           <div>
-            <label className="block text-gray-600 mb-2 font-medium">
+            <label className="block text-gray-700 mb-2 font-medium">
               Location
             </label>
             <input
@@ -163,37 +161,21 @@ const CreateProduct = () => {
               name="location"
               value={form.location}
               onChange={handleChange}
-              placeholder="Enter your city or address"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+              placeholder="Enter city or address"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
               required
             />
           </div>
 
           {/* Media Upload */}
           <div>
-            <label className="block text-gray-600 mb-2 font-medium">
-              Upload Images or Videos
+            <label className="block text-gray-700 mb-3 font-medium">
+              Upload Media (Images / Videos)
             </label>
-
-            {/* Drag-drop style upload box */}
-            <label className="flex flex-col items-center justify-center w-full h-20 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-all">
-              <div className="flex flex-col items-center justify-center pt-5 pb-6 text-gray-500">
-                <svg
-                  className="w-7 h-7 mb-2 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"
-                  />
-                </svg>
-                <p className="text-sm text-gray-500">
-                  Click or drag files to upload
-                </p>
+            <label className="flex flex-col items-center justify-center w-full h-18 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all">
+              <div className="flex flex-col items-center justify-center text-gray-600">
+                <AiOutlineUpload className="w-6 h-6 mb-2 text-blue-500" />
+                <p className="text-sm">Click or drag files to upload</p>
               </div>
               <input
                 type="file"
@@ -210,7 +192,7 @@ const CreateProduct = () => {
                 {preview.map((item, index) => (
                   <div
                     key={index}
-                    className="relative group rounded-lg overflow-hidden border shadow-sm"
+                    className="relative group rounded-lg overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition"
                   >
                     {item.type === "image" ? (
                       <img
@@ -225,11 +207,12 @@ const CreateProduct = () => {
                         className="w-full h-28 object-cover"
                       />
                     )}
-                    {/* Delete Icon */}
+
+                    {/* Delete Button */}
                     <button
                       type="button"
                       onClick={() => handleDeleteMedia(index)}
-                      className="absolute top-1 right-1 bg-black/60 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition"
+                      className="absolute top-1 right-1 bg-black/70 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition"
                     >
                       <AiOutlineClose className="w-4 h-4" />
                     </button>
@@ -239,25 +222,31 @@ const CreateProduct = () => {
             )}
           </div>
 
-          {/* Available */}
-          <div className="flex items-center space-x-2">
+          {/* Availability */}
+          <div className="flex items-center space-x-3">
             <input
               type="checkbox"
               name="available"
               checked={form.available}
               onChange={handleChange}
-              className="w-4 h-4 text-indigo-600 border-gray-300 rounded"
+              className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-400"
             />
-            <label className="text-gray-700">Available for sale</label>
+            <label className="text-gray-700 font-medium">
+              Mark as available for sale
+            </label>
           </div>
 
           {/* Submit */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg transition-all duration-300"
+            className={`w-full py-3.5 mt-2 font-semibold rounded-lg text-white shadow-md transition-all ${
+              loading
+                ? "bg-blue-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700 hover:scale-[1.02]"
+            }`}
           >
-            {loading ? "Creating..." : "Create Product"}
+            {loading ? "Creating Product..." : "Create Product"}
           </button>
         </form>
       </div>

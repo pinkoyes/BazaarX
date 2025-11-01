@@ -13,8 +13,8 @@ const SellerDashboard = () => {
   const fetchProductsData = async () => {
     setLoading(true);
     try {
-      const res = await fetchUserProducts(user?._id);
-      setProducts(res.data);
+      const data = await fetchUserProducts(user?._id);
+      setProducts(data);
     } catch (error) {
       console.error(error);
       toast.error("Failed to fetch your products!");
@@ -47,87 +47,140 @@ const SellerDashboard = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-50">
-        <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10 px-6 md:px-12">
+    <div className="min-h-screen bg-linear-to-br from-gray-50 via-white to-gray-100 py-12 px-6 md:px-14">
       <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-14">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
-            Seller Dashboard
-          </h1>
+        {/* === HEADER SECTION === */}
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-12">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800 tracking-tight">
+              Seller Dashboard
+            </h1>
+            <p className="text-gray-500 mt-2">
+              Manage your store and track your products efficiently.
+            </p>
+          </div>
+
           <Link
             to="/create-product"
-            className="flex items-center gap-2 bg-blue-600 text-white px-2 py-2 md:px-4 md:py-2 rounded-lg hover:bg-blue-700 transition"
+            className="flex items-center gap-2 bg-indigo-600 text-white px-5 py-2.5 rounded-lg hover:bg-indigo-700 transition-all shadow-lg hover:shadow-xl"
           >
-            <FiPlus /> Add Product
+            <FiPlus className="text-lg" /> Add New Product
           </Link>
         </div>
 
+        {/* === DASHBOARD METRICS === */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+          <div className="bg-white shadow-sm border border-gray-100 rounded-xl p-5 hover:shadow-md transition">
+            <p className="text-gray-500 text-sm">Total Products</p>
+            <h2 className="text-2xl font-semibold text-gray-800 mt-2">
+              {products.length}
+            </h2>
+          </div>
+          <div className="bg-white shadow-sm border border-gray-100 rounded-xl p-5 hover:shadow-md transition">
+            <p className="text-gray-500 text-sm">Active Listings</p>
+            <h2 className="text-2xl font-semibold text-green-600 mt-2">
+              {products.filter((p) => p.available).length}
+            </h2>
+          </div>
+          <div className="bg-white shadow-sm border border-gray-100 rounded-xl p-5 hover:shadow-md transition">
+            <p className="text-gray-500 text-sm">Pending Approvals</p>
+            <h2 className="text-2xl font-semibold text-yellow-500 mt-2">0</h2>
+          </div>
+          <div className="bg-white shadow-sm border border-gray-100 rounded-xl p-5 hover:shadow-md transition">
+            <p className="text-gray-500 text-sm">Total Categories</p>
+            <h2 className="text-2xl font-semibold text-indigo-600 mt-2">
+              {[...new Set(products.map((p) => p.category))].length}
+            </h2>
+          </div>
+        </div>
+
+        {/* === PRODUCT GRID === */}
         {products.length === 0 ? (
-          <div className="text-center mt-20 text-gray-600">
-            <p>No products found!</p>
+          <div className="text-center mt-24">
+            <h2 className="text-xl font-semibold text-gray-700 mb-3">
+              You haven’t added any products yet
+            </h2>
+            <p className="text-gray-500 mb-6">
+              Add your first product to start selling and reach more buyers.
+            </p>
             <Link
               to="/create-product"
-              className="mt-4 inline-block text-blue-600 hover:underline"
+              className="bg-indigo-600 text-white px-6 py-2.5 rounded-lg hover:bg-indigo-700 transition shadow-md"
             >
-              Add your first product
+              Add Product
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {products.map((product) => (
               <div
                 key={product._id}
-                className="bg-white shadow-md rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300"
+                className="group bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 overflow-hidden"
               >
-                <img
-                  src={product.media?.[0]?.url}
-                  alt={product.title}
-                  className="w-full h-56 object-cover"
-                />
+                {/* Product Image */}
+                <div className="relative">
+                  <img
+                    src={
+                      product.media?.[0]?.url ||
+                      "https://via.placeholder.com/400x250?text=No+Image"
+                    }
+                    alt={product.title}
+                    className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <span className="absolute top-3 right-3 bg-gray-100 text-gray-700 text-xs font-medium px-3 py-1 rounded-full shadow-sm border border-gray-200">
+                    {product.category}
+                  </span>
+                </div>
 
-                <div className="p-4">
-                  <h2 className="text-lg font-semibold text-gray-800 truncate">
-                    {product.title}
-                  </h2>
-                  <p className="text-gray-500 text-sm line-clamp-2 mb-2">
-                    {product.description}
-                  </p>
-
-                  <div className="flex justify-between items-center mb-3">
-                    <span className="text-gray-700 font-medium">
-                      ₹{product.price}
-                    </span>
-                    <span className="text-sm bg-gray-100 text-gray-600 px-2 py-1 rounded-md">
-                      {product.category}
-                    </span>
+                {/* Product Info */}
+                <div className="p-5 flex flex-col gap-3">
+                  {/* Title & Description */}
+                  <div>
+                    <h2 className="text-lg font-semibold text-gray-800 truncate mb-1">
+                      {product.title}
+                    </h2>
+                    <p className="text-gray-500 text-sm line-clamp-2">
+                      {product.description || "No description provided."}
+                    </p>
                   </div>
 
-                  <div className="flex items-center justify-between mt-4">
-                    <Link
-                      to={`/seller/product/${product._id}`}
-                      className="flex items-center gap-1 text-blue-600 hover:text-blue-800 transition"
-                    >
-                      <FiEye /> View
-                    </Link>
+                  {/* Price & Actions */}
+                  <div className="flex items-center justify-between pt-2 border-t border-gray-100 mt-auto">
+                    <span className="text-indigo-600 font-bold text-lg">
+                      ₹{product.price}
+                    </span>
 
-                    <Link
-                      to={`/edit-product/${product._id}`}
-                      className="flex items-center gap-1 text-green-600 hover:text-green-800 transition"
-                    >
-                      <FiEdit2 /> Edit
-                    </Link>
+                    <div className="flex items-center gap-3">
+                      <Link
+                        to={`/seller/product/${product._id}`}
+                        className="text-gray-600 hover:text-indigo-600 transition"
+                        title="View"
+                      >
+                        <FiEye className="text-lg" />
+                      </Link>
 
-                    <button
-                      onClick={() => handleDelete(product._id)}
-                      className="flex items-center gap-1 text-red-600 hover:text-red-800 transition"
-                    >
-                      <FiTrash2 /> Delete
-                    </button>
+                      <Link
+                        to={`/edit-product/${product._id}`}
+                        className="text-gray-600 hover:text-green-600 transition"
+                        title="Edit"
+                      >
+                        <FiEdit2 className="text-lg" />
+                      </Link>
+
+                      <button
+                        onClick={() => handleDelete(product._id)}
+                        className="text-gray-600 hover:text-red-600 transition"
+                        title="Delete"
+                      >
+                        <FiTrash2 className="text-lg" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -135,6 +188,14 @@ const SellerDashboard = () => {
           </div>
         )}
       </div>
+
+      {/* === FLOATING ADD BUTTON (Mobile Friendly) === */}
+      <Link
+        to="/create-product"
+        className="fixed bottom-8 right-8 bg-indigo-600 text-white rounded-full p-4 shadow-lg hover:bg-indigo-700 transition duration-300 md:hidden"
+      >
+        <FiPlus className="text-2xl" />
+      </Link>
     </div>
   );
 };

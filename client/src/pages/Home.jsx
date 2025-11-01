@@ -52,35 +52,34 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-gray-50 via-white to-gray-100 text-gray-800">
+    <div className="min-h-screen bg-linear-to-b from-gray-50 to-gray-100 text-gray-800">
       {(categoryLoading || productLoading) && <SpinnerOverlay />}
 
       {/* ===== Hero Section ===== */}
-      {/* ===== Hero Section ===== */}
-      <section className="relative flex flex-col items-center justify-center text-center py-28 px-6 overflow-hidden bg-linear-to-r from-blue-500 via-indigo-400 to-purple-500 text-white">
+      <section className="relative flex flex-col items-center justify-center text-center py-28 px-6 overflow-hidden bg-linear-to-r from-blue-600 via-indigo-500 to-purple-600 text-white">
         <img
-          src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=1600&q=80"
+          src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1600&q=80"
           alt="marketplace background"
-          className="absolute inset-0 w-full h-full object-cover opacity-25"
+          className="absolute inset-0 w-full h-full object-cover opacity-20"
         />
         <div className="relative z-10 max-w-3xl mx-auto">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-6 leading-tight drop-shadow-lg">
-            Buy & Sell Anything You Love 💫
+          <h1 className="text-5xl sm:text-6xl font-extrabold mb-5 leading-tight drop-shadow-lg">
+            Discover, Buy & Sell Effortlessly
           </h1>
-          <p className="text-base sm:text-lg md:text-xl mb-10 max-w-2xl mx-auto text-gray-100">
-            Discover amazing deals or sell your items in minutes — safe, fast,
-            and hassle-free.
+          <p className="text-lg sm:text-xl mb-10 text-gray-100">
+            A modern marketplace for everything you love — safe, fast, and
+            effortless.
           </p>
 
-          {/* ===== Search Input ===== */}
+          {/* ===== Search Bar ===== */}
           <div className="flex flex-col sm:flex-row justify-center gap-3 w-full sm:w-auto">
             <div className="relative w-full sm:w-96">
               <input
                 type="text"
-                placeholder="Search for products, categories..."
+                placeholder="Search products or categories..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-5 pr-12 py-3 rounded-xl border border-gray-200 bg-white/20 backdrop-blur-md placeholder-gray-200 text-white focus:outline-none focus:ring-2 focus:ring-white/70 transition-all"
+                className="w-full pl-5 pr-12 py-3 rounded-xl border border-white/30 bg-white/10 text-white placeholder-white/70 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-white/70 transition-all"
               />
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -110,7 +109,7 @@ const Home = () => {
       {/* ===== Categories Section ===== */}
       <section className="py-20 px-4 sm:px-8">
         <h2 className="text-3xl font-bold text-center mb-12 text-gray-800 tracking-tight">
-          🔍 Explore Popular Categories
+          🛍️ Explore Top Categories
         </h2>
 
         {categories.length === 0 ? (
@@ -121,7 +120,7 @@ const Home = () => {
               <div
                 key={i}
                 onClick={() => handleCategoryClick(cat.category)}
-                className="group relative rounded-2xl overflow-hidden shadow-md cursor-pointer transition-all duration-300 hover:scale-[1.03] hover:shadow-xl bg-white"
+                className="group relative rounded-2xl overflow-hidden shadow-md cursor-pointer bg-white hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
               >
                 <img
                   src={
@@ -129,10 +128,10 @@ const Home = () => {
                     `https://via.placeholder.com/400x300?text=${cat.category}`
                   }
                   alt={cat.category}
-                  className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110"
+                  className="w-full h-44 object-cover transition-transform duration-500 group-hover:scale-110"
                 />
-                <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/30 to-transparent flex items-end justify-center pb-5">
-                  <span className="text-white font-medium text-lg tracking-wide drop-shadow-sm">
+                <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/30 to-transparent flex items-end justify-center pb-4">
+                  <span className="text-white font-semibold text-lg tracking-wide">
                     {cat.category}
                   </span>
                 </div>
@@ -162,12 +161,12 @@ const Home = () => {
       </section>
 
       {/* ===== CTA Section ===== */}
-      <section className="py-24 px-6 bg-linear-to-r from-blue-50 to-indigo-100 text-center mx-4 sm:mx-10 lg:mx-32 mt-16 rounded-3xl shadow-xl">
+      <section className="py-24 px-6 bg-linear-to-r from-blue-100 via-indigo-100 to-purple-100 text-center mx-4 sm:mx-10 lg:mx-32 mt-16 rounded-3xl shadow-xl">
         <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
           Ready to Sell Your Product?
         </h2>
         <p className="mb-8 text-gray-700 text-lg max-w-xl mx-auto">
-          Join thousands of sellers and reach buyers instantly on our trusted
+          Join thousands of sellers and start earning today on our trusted
           marketplace.
         </p>
         <Link

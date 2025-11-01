@@ -29,11 +29,11 @@ const CategoryPage = () => {
   if (isError) toast.error("Failed to load products for this category.");
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-100 font-sans text-gray-800">
+    <div className="min-h-screen bg-linear-to-b from-gray-50 via-white to-gray-100 font-sans text-gray-800">
       {isLoading && <SpinnerOverlay />}
 
       {/* ===== Header Section ===== */}
-      <section className="py-20 px-6 bg-gradient-to-r from-blue-600 via-indigo-500 to-purple-600 text-white text-center shadow-lg">
+      <section className="py-20 px-6 bg-linear-to-r from-blue-600 via-indigo-500 to-purple-600 text-white text-center shadow-lg">
         <h1 className="text-4xl md:text-5xl font-extrabold mb-4 capitalize drop-shadow-lg">
           {categoryName}
         </h1>
