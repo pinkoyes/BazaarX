@@ -1,178 +1,190 @@
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { fetchProductsForHomePage, fetchAllCategories } from "../api/product";
+import ProductCard from "../components/ProductCard";
+import toast from "react-hot-toast";
 
-const categories = [
-  {
-    name: "Electronics",
-    img: "https://images.unsplash.com/photo-1519389950473-47ba0277781c",
-  },
-  {
-    name: "Furniture",
-    img: "https://italica.com/cdn/shop/articles/05.png?v=1668071361",
-  },
-  {
-    name: "Fashion",
-    img: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d",
-  },
-  {
-    name: "Vehicles",
-    img: "https://images.unsplash.com/photo-1503376780353-7e6692767b70",
-  },
-];
+// ===== Spinner Components =====
+const SpinnerOverlay = () => (
+  <div className="fixed inset-0 flex items-center justify-center bg-white/70 backdrop-blur-sm z-50">
+    <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+  </div>
+);
 
-const featuredProducts = [
-  {
-    name: "iPhone 14 Pro",
-    price: "$999",
-    img: "https://images.unsplash.com/photo-1631031877036-2d7f542f6a37",
-  },
-  {
-    name: "Leather Sofa",
-    price: "$499",
-    img: "https://images.unsplash.com/photo-1616628180747-75d5c512f7c3",
-  },
-  {
-    name: "Mountain Bike",
-    price: "$299",
-    img: "https://images.unsplash.com/photo-1508170495126-4a9ec9353b48",
-  },
-  {
-    name: "Stylish Jacket",
-    price: "$79",
-    img: "https://images.unsplash.com/photo-1520975911094-123f5db1e264",
-  },
-];
+const Spinner = () => (
+  <div className="flex justify-center items-center h-40">
+    <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+  </div>
+);
 
 const Home = () => {
+  const navigate = useNavigate();
+  const [search, setSearch] = useState("");
+
+  // ===== Fetch Categories =====
+  const {
+    data: categories = [],
+    isLoading: categoryLoading,
+    isError: categoryError,
+  } = useQuery({
+    queryKey: ["categories"],
+    queryFn: fetchAllCategories,
+    staleTime: 1000 * 60 * 10,
+  });
+
+  // ===== Fetch Featured Products =====
+  const {
+    data: products = [],
+    isLoading: productLoading,
+    isError: productError,
+  } = useQuery({
+    queryKey: ["homeProducts"],
+    queryFn: fetchProductsForHomePage,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  if (categoryError) toast.error("Failed to load categories");
+  if (productError) toast.error("Failed to load featured products");
+
+  const handleCategoryClick = (cat) => {
+    navigate(`/category/${encodeURIComponent(cat)}`);
+  };
+
   return (
-    <div className="min-h-screen bg-linear-to-b from-gray-50 to-[rgba(255,255,255,0.8)] font-sans">
-      {/* Hero Section */}
-      <section className="flex flex-col items-center justify-center text-center py-20 px-4">
-        <h1 className="text-4xl md:text-6xl font-bold mb-4 animate-fadeIn text-gray-900">
-          Buy & Sell Anything You Love
-        </h1>
-        <p className="text-lg md:text-xl mb-6 animate-fadeIn animate-delay-200 max-w-xl text-gray-700">
-          Discover amazing deals or sell your items in minutes. Safe, fast, and
-          hassle-free.
-        </p>
+    <div className="min-h-screen bg-linear-to-b from-gray-50 via-white to-gray-100 text-gray-800">
+      {(categoryLoading || productLoading) && <SpinnerOverlay />}
 
-        <div className="flex justify-center gap-2 animate-fadeIn animate-delay-400 flex-wrap">
-          <input
-            type="text"
-            placeholder="Search for products..."
-            className="w-64 md:w-92 p-3 rounded-xl border border-gray-300 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-          />
-          <button className="bg-blue-600 text-white px-4 py-3 rounded-xl hover:bg-blue-700 transition font-semibold cursor-pointer">
-            Search
-          </button>
-        </div>
+      {/* ===== Hero Section ===== */}
+      {/* ===== Hero Section ===== */}
+      <section className="relative flex flex-col items-center justify-center text-center py-28 px-6 overflow-hidden bg-linear-to-r from-blue-500 via-indigo-400 to-purple-500 text-white">
+        <img
+          src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=1600&q=80"
+          alt="marketplace background"
+          className="absolute inset-0 w-full h-full object-cover opacity-25"
+        />
+        <div className="relative z-10 max-w-3xl mx-auto">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-6 leading-tight drop-shadow-lg">
+            Buy & Sell Anything You Love 💫
+          </h1>
+          <p className="text-base sm:text-lg md:text-xl mb-10 max-w-2xl mx-auto text-gray-100">
+            Discover amazing deals or sell your items in minutes — safe, fast,
+            and hassle-free.
+          </p>
 
-        {/* <div className="mt-12 flex items-center justify-center gap-3 animate-fadeIn animate-delay-600 flex-wrap">
-          <button className="bg-blue-600 text-white px-6 py-3 rounded-full text-lg hover:bg-blue-700 transition transform hover:scale-105 font-semibold shadow-lg">
-            Start Selling
-          </button>
-          <button className="px-6 py-3 rounded-full text-lg border border-blue-300 hover:bg-blue-50 transition transform hover:scale-105 font-semibold">
-            Explore
-          </button>
-        </div> */}
-      </section>
-
-      {/* Categories Section */}
-      <section className="py-16 px-6">
-        <h2 className="text-3xl font-semibold text-center mb-10 animate-fadeIn text-gray-800">
-          Browse by Category
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 max-w-6xl mx-auto">
-          {categories.map((cat, i) => (
-            <div
-              key={i}
-              className="relative overflow-hidden rounded-2xl shadow hover:shadow-lg transition cursor-pointer group animate-fadeIn"
-              style={{ animationDelay: `${i * 100}ms` }}
-            >
-              <img
-                src={cat.img}
-                alt={cat.name}
-                className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+          {/* ===== Search Input ===== */}
+          <div className="flex flex-col sm:flex-row justify-center gap-3 w-full sm:w-auto">
+            <div className="relative w-full sm:w-96">
+              <input
+                type="text"
+                placeholder="Search for products, categories..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full pl-5 pr-12 py-3 rounded-xl border border-gray-200 bg-white/20 backdrop-blur-md placeholder-gray-200 text-white focus:outline-none focus:ring-2 focus:ring-white/70 transition-all"
               />
-              <div className="absolute inset-0 bg-black/30 flex items-center justify-center text-white text-xl font-semibold">
-                {cat.name}
-              </div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-5 h-5 text-gray-200 absolute right-4 top-1/2 -translate-y-1/2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1110 3a7.5 7.5 0 016.65 13.65z"
+                />
+              </svg>
             </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Featured Products Section */}
-      <section className="py-16 px-6">
-        <h2 className="text-3xl font-semibold text-center mb-10 animate-fadeIn text-gray-800">
-          Featured Products
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 max-w-6xl mx-auto">
-          {featuredProducts.map((product, i) => (
-            <div
-              key={i}
-              className="bg-white rounded-2xl shadow hover:shadow-lg transition cursor-pointer group overflow-hidden transform hover:scale-105"
+            <button
+              onClick={() => toast("Search feature coming soon!")}
+              className="bg-white text-blue-700 font-semibold px-8 py-3 rounded-xl hover:bg-blue-100 transition shadow-md"
             >
-              <img
-                src={product.img}
-                alt={product.name}
-                className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-              />
-              <div className="p-4">
-                <h3 className="text-lg font-semibold mb-2 text-gray-800">
-                  {product.name}
-                </h3>
-                <p className="text-blue-600 font-bold">{product.price}</p>
-              </div>
-            </div>
-          ))}
+              Search
+            </button>
+          </div>
         </div>
       </section>
 
-      {/* How it Works Section */}
-      <section className="py-16 px-6">
-        <h2 className="text-3xl font-semibold text-center mb-10 animate-fadeIn text-gray-800">
-          How it Works
+      {/* ===== Categories Section ===== */}
+      <section className="py-20 px-4 sm:px-8">
+        <h2 className="text-3xl font-bold text-center mb-12 text-gray-800 tracking-tight">
+          🔍 Explore Popular Categories
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto text-center">
-          <div className="p-6 bg-white rounded-2xl shadow hover:shadow-lg transition transform hover:scale-105">
-            <h3 className="text-xl font-semibold mb-2">List Your Item</h3>
-            <p className="text-gray-600">
-              Quickly add your product with images and description.
-            </p>
+
+        {categories.length === 0 ? (
+          <p className="text-center text-gray-500">No categories found.</p>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-8 max-w-7xl mx-auto">
+            {categories.slice(0, 6).map((cat, i) => (
+              <div
+                key={i}
+                onClick={() => handleCategoryClick(cat.category)}
+                className="group relative rounded-2xl overflow-hidden shadow-md cursor-pointer transition-all duration-300 hover:scale-[1.03] hover:shadow-xl bg-white"
+              >
+                <img
+                  src={
+                    cat.image ||
+                    `https://via.placeholder.com/400x300?text=${cat.category}`
+                  }
+                  alt={cat.category}
+                  className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/30 to-transparent flex items-end justify-center pb-5">
+                  <span className="text-white font-medium text-lg tracking-wide drop-shadow-sm">
+                    {cat.category}
+                  </span>
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="p-6 bg-white rounded-2xl shadow hover:shadow-lg transition transform hover:scale-105">
-            <h3 className="text-xl font-semibold mb-2">Connect with Buyers</h3>
-            <p className="text-gray-600">
-              Chat safely with interested buyers and negotiate deals.
-            </p>
-          </div>
-          <div className="p-6 bg-white rounded-2xl shadow hover:shadow-lg transition transform hover:scale-105">
-            <h3 className="text-xl font-semibold mb-2">Complete the Sale</h3>
-            <p className="text-gray-600">
-              Finalize transactions easily and get your item sold.
-            </p>
-          </div>
-        </div>
+        )}
       </section>
 
-      {/* Call-to-Action Banner */}
-      <section className="py-16 px-6 bg-blue-100 text-blue-900 text-center rounded-lg mx-6 md:mx-32 mt-16 shadow-lg">
-        <h2 className="text-3xl font-bold mb-4">Ready to Sell Your Product?</h2>
-        <p className="mb-6">
-          Join thousands of sellers and reach buyers instantly.
+      {/* ===== Featured Products Section ===== */}
+      <section className="py-20 px-4 sm:px-8 bg-gray-50 border-t border-gray-200">
+        <h2 className="text-3xl font-bold text-center mb-12 text-gray-800 tracking-tight">
+          ⭐ Featured Products
+        </h2>
+
+        {productLoading ? (
+          <Spinner />
+        ) : products.length === 0 ? (
+          <p className="text-center text-gray-500">No products available.</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+            {products.map((product) => (
+              <ProductCard key={product._id} product={product} />
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* ===== CTA Section ===== */}
+      <section className="py-24 px-6 bg-linear-to-r from-blue-50 to-indigo-100 text-center mx-4 sm:mx-10 lg:mx-32 mt-16 rounded-3xl shadow-xl">
+        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          Ready to Sell Your Product?
+        </h2>
+        <p className="mb-8 text-gray-700 text-lg max-w-xl mx-auto">
+          Join thousands of sellers and reach buyers instantly on our trusted
+          marketplace.
         </p>
         <Link
-          to="/product/create"
-          className="bg-blue-600 text-white px-6 py-3 rounded-full font-semibold hover:scale-105 transition transform shadow-lg"
+          to="/create-product"
+          className="bg-blue-600 text-white px-8 sm:px-10 py-3 sm:py-4 rounded-full font-semibold hover:bg-blue-700 transition transform hover:scale-105 shadow-lg"
         >
           List Your Product Now
         </Link>
       </section>
 
-      {/* Floating Add Product Button */}
-      <button className="fixed bottom-8 right-8 bg-blue-600 text-white p-5 rounded-full shadow-lg hover:bg-blue-700 transition transform hover:scale-110 cursor-pointer">
+      {/* ===== Floating Add Button ===== */}
+      <Link
+        to="/create-product"
+        className="fixed bottom-8 right-8 bg-blue-600 text-white p-5 rounded-full shadow-lg hover:bg-blue-700 transition transform hover:scale-110 cursor-pointer text-2xl"
+      >
         ➕
-      </button>
+      </Link>
     </div>
   );
 };

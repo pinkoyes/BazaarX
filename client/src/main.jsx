@@ -5,12 +5,23 @@ import router from "./Routes";
 import { RouterProvider } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "./context/AuthContext";
+import store from "./redux/store";
+import { Provider } from "react-redux";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+
+const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <AuthProvider>
-      <RouterProvider router={router} />
-      <Toaster position="top-center" reverseOrder={false} />
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <Provider store={store}>
+        <AuthProvider>
+          <RouterProvider router={router} />
+          <Toaster position="bottom-right" reverseOrder={false} />
+          <ReactQueryDevtools initialIsOpen={false} />
+        </AuthProvider>
+      </Provider>
+    </QueryClientProvider>
   </StrictMode>
 );

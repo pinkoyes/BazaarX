@@ -109,7 +109,7 @@ const SellerDashboard = () => {
 
                   <div className="flex items-center justify-between mt-4">
                     <Link
-                      to={`/product/${product._id}`}
+                      to={`/seller/product/${product._id}`}
                       className="flex items-center gap-1 text-blue-600 hover:text-blue-800 transition"
                     >
                       <FiEye /> View

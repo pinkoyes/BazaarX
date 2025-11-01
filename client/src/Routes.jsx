@@ -8,8 +8,10 @@ import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import CreateProduct from "./pages/product/CreateProduct";
 import SellerDashboard from "./pages/dashboard/SellerDashboard";
-import ViewProduct from "./pages/product/ViewProduct";
+import ViewSellerProduct from "./pages/product/ViewSellerProduct";
 import UpdateProduct from "./pages/product/UpdateProduct";
+import CategoryPage from "./pages/product/CategoryPage";
+import ViewProduct from "./pages/product/ViewProduct";
 
 const router = createBrowserRouter([
   {
@@ -30,8 +32,12 @@ const router = createBrowserRouter([
         element: <SellerDashboard />,
       },
       {
-        path: "product/create",
+        path: "create-product",
         element: <CreateProduct />,
+      },
+      {
+        path: "seller/product/:id",
+        element: <ViewSellerProduct />,
       },
       {
         path: "product/:id",
@@ -40,6 +46,10 @@ const router = createBrowserRouter([
       {
         path: "edit-product/:id",
         element: <UpdateProduct />,
+      },
+      {
+        path: "/category/:categoryName",
+        element: <CategoryPage />,
       },
     ],
   },
