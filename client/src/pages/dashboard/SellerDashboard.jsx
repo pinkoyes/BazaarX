@@ -75,7 +75,7 @@ const SellerDashboard = () => {
         </div>
 
         {/* === DASHBOARD METRICS === */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
           <div className="bg-white shadow-sm border border-gray-100 rounded-xl p-5 hover:shadow-md transition">
             <p className="text-gray-500 text-sm">Total Products</p>
             <h2 className="text-2xl font-semibold text-gray-800 mt-2">

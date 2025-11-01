@@ -14,7 +14,7 @@ const LandingPage = () => {
       <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-yellow-400 rounded-full opacity-20 blur-3xl animate-pulseSlow delay-500"></div>
 
       {/* ===== Hero Content ===== */}
-      <div className="relative z-10 text-center max-w-3xl px-6 sm:px-10 md:px-16">
+      <div className="relative bottom-20 z-10 text-center max-w-3xl px-6 sm:px-10 md:px-16">
         <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold leading-tight mb-6 animate-fadeIn drop-shadow-lg">
           Discover, <span className="text-yellow-400">Buy</span> &{" "}
           <span className="text-yellow-400">Sell</span> Effortlessly
@@ -40,11 +40,6 @@ const LandingPage = () => {
             Learn More
           </Link>
         </div>
-      </div>
-
-      {/* ===== Footer or Tagline ===== */}
-      <div className="absolute bottom-6 text-center text-white/70 text-sm sm:text-base">
-        © {new Date().getFullYear()} MarketHub • Built for buyers and sellers
       </div>
 
       {/* ===== Custom Animations ===== */}

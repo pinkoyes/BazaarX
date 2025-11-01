@@ -31,7 +31,7 @@ const Header = () => {
               className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover border border-gray-300 hover:scale-110 transition-transform duration-300"
             />
             <span className="text-2xl md:text-3xl font-bold text-blue-600 hover:text-blue-700 transition-colors">
-              AgoraX
+              BazaarX
             </span>
           </Link>
         </div>
