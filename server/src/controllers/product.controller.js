@@ -149,13 +149,13 @@ export const productByCategory = asyncHandler(async (req, res) => {
   const { category } = req.query;
 
   if (!category) {
-    throw new ApiError(400, "category doesn't exist");
+    throw new ApiError(400, "Category is required");
   }
 
-  const products = await Product.find(category);
+  const products = await Product.find({ category }).sort({ createdAt: -1 });
 
-  if (!products) {
-    throw new ApiError(404, "Products with this category not found.");
+  if (!products || products.length === 0) {
+    throw new ApiError(404, "No products found in this category");
   }
 
   return res
@@ -164,7 +164,50 @@ export const productByCategory = asyncHandler(async (req, res) => {
       new ApiResponse(
         200,
         products,
-        "Fetch product based on category successfully!"
+        "Fetched products by category successfully!"
       )
     );
+});
+
+export const getCategories = asyncHandler(async (req, res) => {
+  const categories = await Product.aggregate([
+    {
+      $group: {
+        _id: "$category",
+        totalProducts: { $sum: 1 },
+        // grab one sample media (image) from the group
+        sampleProduct: { $first: "$$ROOT" },
+      },
+    },
+    { $sort: { totalProducts: -1 } },
+    { $limit: 8 },
+    {
+      $project: {
+        _id: 0,
+        category: "$_id",
+        totalProducts: 1,
+        image: {
+          // pick the first media url if available
+          $arrayElemAt: [
+            {
+              $map: {
+                input: "$sampleProduct.media",
+                as: "m",
+                in: "$$m.url",
+              },
+            },
+            0,
+          ],
+        },
+      },
+    },
+  ]);
+
+  if (!categories) {
+    throw new ApiError(404, "Categories not found.");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, categories, "Fetched category successfully!"));
 });
