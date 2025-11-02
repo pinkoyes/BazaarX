@@ -27,8 +27,6 @@ export const createProduct = asyncHandler(async (req, res) => {
 
   const productData = { ...req.body, ownerId, media: uploadedFiles };
 
-  console.log(productData);
-
   const validateProductData = createProductSchema.safeParse(productData);
   if (!validateProductData.success) {
     await Promise.all(
