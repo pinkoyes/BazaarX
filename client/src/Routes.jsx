@@ -13,6 +13,8 @@ import UpdateProduct from "./pages/product/UpdateProduct";
 import CategoryPage from "./pages/product/CategoryPage";
 import ViewProduct from "./pages/product/ViewProduct";
 import CheckoutPage from "./pages/product/CheckoutPage";
+import MyOrder from "./pages/orders/MyOrder";
+import SellerRequests from "./pages/dashboard/SellerRequests";
 
 const router = createBrowserRouter([
   {
@@ -55,6 +57,14 @@ const router = createBrowserRouter([
       {
         path: "/checkout/:productId",
         element: <CheckoutPage />,
+      },
+      {
+        path: "/my-orders",
+        element: <MyOrder />,
+      },
+      {
+        path: "/seller/requests",
+        element: <SellerRequests />,
       },
     ],
   },
