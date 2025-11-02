@@ -34,16 +34,14 @@ export const placeOrder = asyncHandler(async (req, res) => {
     deliveryAddress,
   });
 
-  product.available = false;
-
-  await product.save();
+  await Product.findByIdAndUpdate(product._id, { $set: { available: false } });
 
   return res
     .status(201)
     .json(new ApiResponse(201, order, "Order placed successfully"));
 });
 
-export const buyerOrders = asyncHandler(async (req, res) => {
+export const myOrders = asyncHandler(async (req, res) => {
   const buyerId = req.user?._id;
 
   if (!buyerId) {
@@ -74,7 +72,7 @@ export const sellerOrders = asyncHandler(async (req, res) => {
     .populate("productId")
     .populate("buyerId", " fullName email phoneNumber");
 
-  if (!orders || orders.length === 0) {
+  if (!orders) {
     throw new ApiError(404, "No orders exists yet");
   }
 
@@ -103,6 +101,12 @@ export const OrderStatus = asyncHandler(async (req, res) => {
 
   order.status = status;
   await order.save();
+
+  if (status === "rejected") {
+    await Product.findByIdAndUpdate(order.productId, {
+      $set: { available: true },
+    });
+  }
 
   return res
     .status(200)
