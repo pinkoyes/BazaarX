@@ -1,6 +1,7 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import { ApiError } from "./utils/ApiError.js";
 
 const corsOptions = {
   origin: process.env.CLIENT_ORIGIN,
@@ -21,5 +22,24 @@ import orderRouter from "./routes/order.route.js";
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/product", productRouter);
 app.use("/api/v1/order", orderRouter);
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error("Error caught by middleware:", err);
+
+  if (err instanceof ApiError) {
+    return res.status(err.statusCode).json({
+      success: false,
+      message: err.message,
+      errors: err.errors || [],
+    });
+  }
+
+  // Handle unexpected errors
+  return res.status(500).json({
+    success: false,
+    message: err.message || "Internal Server Error",
+  });
+});
 
 export default app;

@@ -22,7 +22,7 @@ export const placeOrder = asyncHandler(async (req, res) => {
     throw new ApiError(400, "You cannot buy your own product.");
   }
 
-  const order = new Order.create({
+  const order = await Order.create({
     productId: product._id,
     buyerId,
     sellerId: product.ownerId._id,
