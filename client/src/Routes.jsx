@@ -12,6 +12,7 @@ import ViewSellerProduct from "./pages/product/ViewSellerProduct";
 import UpdateProduct from "./pages/product/UpdateProduct";
 import CategoryPage from "./pages/product/CategoryPage";
 import ViewProduct from "./pages/product/ViewProduct";
+import CheckoutPage from "./pages/product/CheckoutPage";
 
 const router = createBrowserRouter([
   {
@@ -50,6 +51,10 @@ const router = createBrowserRouter([
       {
         path: "/category/:categoryName",
         element: <CategoryPage />,
+      },
+      {
+        path: "/checkout/:productId",
+        element: <CheckoutPage />,
       },
     ],
   },
