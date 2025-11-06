@@ -6,19 +6,36 @@ import { Message } from "../models/message.model.js";
 import { Product } from "../models/product.model.js";
 
 export const createOrGetChatRoom = asyncHandler(async (req, res) => {
-  const { productId } = req.body;
-  const buyerId = req.user?._id;
+  const { productId, buyerId: buyerFromBody } = req.body;
+  const userId = req.user?._id;
+
+  if (!productId) {
+    throw new ApiError(400, "Product ID is required");
+  }
 
   const product = await Product.findById(productId);
-
   if (!product) {
     throw new ApiError(404, "Product not found");
   }
 
   const sellerId = product.ownerId;
 
+  let buyerId;
+
+  if (userId.toString() === sellerId.toString()) {
+    if (!buyerFromBody) {
+      throw new ApiError(
+        400,
+        "Buyer ID is required when seller initiates the chat"
+      );
+    }
+    buyerId = buyerFromBody;
+  } else {
+    buyerId = userId;
+  }
+
   if (buyerId.toString() === sellerId.toString()) {
-    throw new ApiError(400, "Cannot chat with yourself");
+    throw new ApiError(400, "Cannot create chat with yourself");
   }
 
   let chatRoom = await ChatRoom.findOne({
@@ -35,7 +52,7 @@ export const createOrGetChatRoom = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, chatRoom, "Chat create successfully!"));
+    .json(new ApiResponse(200, { chatRoom }, "Chat created successfully"));
 });
 
 export const sendMessage = asyncHandler(async (req, res) => {
