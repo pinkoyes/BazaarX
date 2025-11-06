@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { fetchProductById, initiateChatWithOwner } from "../../api/product";
+import { fetchProductById } from "../../api/product";
+import { initiateChatRoom } from "../../api/chat";
 import {
   FiMapPin,
   FiUser,
@@ -19,6 +20,7 @@ const ViewProduct = () => {
   const [liked, setLiked] = useState(false);
   const [currentImage, setCurrentImage] = useState(0);
 
+  // === Fetch product details ===
   const {
     data: product,
     isLoading,
@@ -29,13 +31,21 @@ const ViewProduct = () => {
     staleTime: 1000 * 60 * 2,
   });
 
+  // === Chat Mutation ===
   const chatMutation = useMutation({
-    mutationFn: (ownerId) => initiateChatWithOwner({ ownerId, productId: id }),
+    mutationFn: () => initiateChatRoom({ productId: id }),
     onSuccess: (data) => {
+      if (!data?.chatRoom?._id) {
+        toast.error("Unexpected server response. Try again.");
+        return;
+      }
       toast.success("Chat started successfully!");
-      navigate(`/chat/${data.chatId}`);
+      navigate(`/chat/${data.chatRoom._id}`);
     },
-    onError: () => toast.error("Failed to start chat. Try again."),
+    onError: (error) => {
+      console.error("Chat initiation error:", error);
+      toast.error(error?.response?.data?.message || "Failed to start chat.");
+    },
   });
 
   if (isLoading) return <Spinner />;
@@ -46,22 +56,31 @@ const ViewProduct = () => {
       </div>
     );
 
-  const handleChat = () => chatMutation.mutate(product.ownerId?._id);
+  const handleChat = () => {
+    // if (!product.available) {
+    //   toast.error("This product is no longer available!");
+    //   return;
+    // }
+    chatMutation.mutate();
+  };
+
   const handleLike = () => {
     setLiked((prev) => !prev);
     toast.success(liked ? "Removed from favorites" : "Added to favorites");
   };
+
   const nextImage = () =>
     setCurrentImage((prev) =>
       prev === product.media.length - 1 ? 0 : prev + 1
     );
+
   const prevImage = () =>
     setCurrentImage((prev) =>
       prev === 0 ? product.media.length - 1 : prev - 1
     );
 
   const handlePlaceOrder = () => {
-    navigate(`/checkout/${id}`); // redirect to billing/checkout page
+    navigate(`/checkout/${id}`);
   };
 
   return (
@@ -151,7 +170,7 @@ const ViewProduct = () => {
             </div>
           </div>
 
-          {/* Seller Card */}
+          {/* Seller Info */}
           <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 shadow-sm">
             <h3 className="text-lg font-semibold mb-4 text-gray-800">
               Seller Information

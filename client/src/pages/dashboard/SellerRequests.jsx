@@ -1,17 +1,17 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 import { fetchSellerOrders, updateOrderStatus } from "../../api/order";
+import { initiateChatRoom } from "../../api/chat";
 import {
   FiPackage,
   FiUser,
   FiMapPin,
-  FiClock,
-  FiCheck,
-  FiX,
-  FiMessageSquare,
   FiMail,
   FiPhone,
   FiCreditCard,
+  FiCheck,
+  FiX,
+  FiMessageSquare,
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 
@@ -19,6 +19,7 @@ const SellerRequests = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
+  // === Fetch seller orders ===
   const {
     data: orders,
     isLoading,
@@ -29,14 +30,28 @@ const SellerRequests = () => {
     queryFn: fetchSellerOrders,
   });
 
+  // === Update order status ===
   const mutation = useMutation({
     mutationFn: ({ orderId, status }) => updateOrderStatus(orderId, status),
     onSuccess: () => {
       toast.success("Order status updated successfully!");
       queryClient.invalidateQueries(["sellerRequests"]);
     },
-    onError: () => {
-      toast.error("Failed to update order status!");
+    onError: () => toast.error("Failed to update order status!"),
+  });
+
+  // === Chat mutation ===
+  const chatMutation = useMutation({
+    mutationFn: ({ productId, buyerId }) =>
+      initiateChatRoom({ productId, buyerId }),
+    onSuccess: (data) => {
+      toast.success("Chat started successfully!");
+      navigate(`/chat/${data.chatRoom._id}`);
+    },
+    onError: (error) => {
+      toast.error(
+        error?.response?.data?.message || "Failed to start chat with buyer."
+      );
     },
   });
 
@@ -74,7 +89,7 @@ const SellerRequests = () => {
               key={order._id}
               className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-200 flex flex-col overflow-hidden"
             >
-              {/* Product Image */}
+              {/* === Product Image === */}
               <div className="relative">
                 <img
                   src={
@@ -97,7 +112,7 @@ const SellerRequests = () => {
                 </span>
               </div>
 
-              {/* Card Content */}
+              {/* === Card Content === */}
               <div className="p-6 flex flex-col grow justify-between">
                 {/* Product Info */}
                 <div>
@@ -114,7 +129,6 @@ const SellerRequests = () => {
                   </p>
                 </div>
 
-                {/* Divider */}
                 <div className="my-4 border-t border-gray-100" />
 
                 {/* Buyer Info */}
@@ -158,10 +172,9 @@ const SellerRequests = () => {
                   </div>
                 </div>
 
-                {/* Divider */}
                 <div className="my-4 border-t border-gray-100" />
 
-                {/* Actions */}
+                {/* === Actions === */}
                 <div className="flex flex-col gap-2">
                   {order.status === "pending" ? (
                     <div className="flex gap-3">
@@ -199,16 +212,21 @@ const SellerRequests = () => {
                     </div>
                   )}
 
+                  {/* ✅ Chat with Buyer */}
                   <button
                     onClick={() =>
-                      navigate(
-                        `/chat?buyer=${order.buyerId?._id}&product=${order.productId?._id}`
-                      )
+                      chatMutation.mutate({
+                        productId: order.productId?._id,
+                        buyerId: order.buyerId?._id, // ✅ added for seller-initiated chat
+                      })
                     }
-                    className="flex items-center justify-center gap-2 border border-indigo-500 text-indigo-600 hover:bg-indigo-50 font-medium px-4 py-2 rounded-xl transition"
+                    disabled={chatMutation.isPending}
+                    className="flex items-center justify-center gap-2 border border-indigo-500 text-indigo-600 hover:bg-indigo-50 font-medium px-4 py-2 rounded-xl transition disabled:opacity-70"
                   >
                     <FiMessageSquare />
-                    Chat with Buyer
+                    {chatMutation.isPending
+                      ? "Starting Chat..."
+                      : "Chat with Buyer"}
                   </button>
                 </div>
               </div>

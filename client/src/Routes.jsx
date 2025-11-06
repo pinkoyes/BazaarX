@@ -15,6 +15,7 @@ import ViewProduct from "./pages/product/ViewProduct";
 import CheckoutPage from "./pages/product/CheckoutPage";
 import MyOrder from "./pages/orders/MyOrder";
 import SellerRequests from "./pages/dashboard/SellerRequests";
+import ChatPage from "./pages/chat/ChatPage";
 
 const router = createBrowserRouter([
   {
@@ -65,6 +66,10 @@ const router = createBrowserRouter([
       {
         path: "/seller/requests",
         element: <SellerRequests />,
+      },
+      {
+        path: "/chat/:chatRoomId",
+        element: <ChatPage />,
       },
     ],
   },
