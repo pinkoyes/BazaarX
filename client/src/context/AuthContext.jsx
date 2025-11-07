@@ -1,5 +1,11 @@
 import { createContext, useEffect, useState, useContext } from "react";
-import { register, login, logout, currentUser } from "../api/auth";
+import {
+  register,
+  login,
+  logout,
+  currentUser,
+  googleAuthApi,
+} from "../api/auth";
 import toast from "react-hot-toast";
 
 export const AuthContext = createContext(null);
@@ -67,6 +73,14 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const googleLoginUser = async (token) => {
+    setLoading(true);
+    const res = await googleAuthApi(token);
+    setUser(res.data.user);
+    setLoading(false);
+    return res;
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -76,6 +90,7 @@ export const AuthProvider = ({ children }) => {
         registerUser,
         loginUser,
         logoutUser,
+        googleLoginUser,
       }}
     >
       {children}

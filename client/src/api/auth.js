@@ -19,3 +19,8 @@ export const currentUser = async () => {
   const res = await api.get("/auth/me");
   return res.data;
 };
+
+export const googleAuthApi = async (googleAuthToken) => {
+  const res = await api.post("/auth/google", { googleAuthToken });
+  return res.data;
+};

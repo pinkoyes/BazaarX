@@ -6,13 +6,15 @@ import { validateLoginField } from "../../utils/helper/validate";
 import { loginSchema } from "../../utils/validations/auth.validation";
 import toast from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
+import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
 
 const Login = () => {
   const [formData, setFormData] = useState({
     contact: "",
     password: "",
   });
-  const { loginUser, loading } = useAuth();
+
+  const { loginUser, googleLoginUser, loading } = useAuth();
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
@@ -38,19 +40,23 @@ const Login = () => {
 
       const { success } = await loginUser(payload);
       if (success) navigate("/home");
-      toast.success("Login successfully!");
-      setFormData({
-        contact: "",
-        password: "",
-      });
+      toast.success("Login successful!");
+      setFormData({ contact: "", password: "" });
     } catch (error) {
-      toast.error("Try again!");
+      toast.error("Login failed, please try again!");
     }
   };
 
-  const handleGoogleAuth = () => {
-    console.log("Google Auth clicked");
-    // TODO: integrate Google OAuth
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      const token = credentialResponse.credential;
+      await googleLoginUser(token);
+      toast.success("Google login successful!");
+      navigate("/home");
+    } catch (error) {
+      console.error("Google login failed:", error);
+      toast.error("Google login failed");
+    }
   };
 
   return (
@@ -62,7 +68,6 @@ const Login = () => {
         Log in to your account
       </p>
 
-      {/* Login Form */}
       <form onSubmit={handleSubmit}>
         <Input
           name="contact"
@@ -85,29 +90,44 @@ const Login = () => {
 
         <button
           type="submit"
-          className="w-full bg-indigo-600 text-white py-2 rounded-lg font-medium hover:bg-indigo-700 transition mt-2 cursor-pointer"
+          disabled={loading}
+          className="w-full bg-indigo-600 text-white py-2 rounded-lg font-medium hover:bg-indigo-700 transition mt-2 cursor-pointer disabled:opacity-60"
         >
-          Login
+          {loading ? "Logging in..." : "Login"}
         </button>
       </form>
 
-      {/* Divider */}
       <div className="flex items-center my-6">
         <hr className="grow border-gray-300" />
         <span className="mx-2 text-gray-400 text-sm">or</span>
         <hr className="grow border-gray-300" />
       </div>
 
-      {/* Google Auth Button */}
-      <button
-        onClick={handleGoogleAuth}
-        className="w-full flex items-center justify-center gap-3 border border-gray-300 py-2 rounded-lg hover:bg-gray-100 transition cursor-pointer"
-      >
-        <FcGoogle size={24} />
-        <span className="text-gray-700 font-medium">Continue with Google</span>
-      </button>
+      <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+        <div className="flex justify-center">
+          <div className="w-full">
+            <button
+              type="button"
+              onClick={(e) => e.preventDefault()}
+              className="w-full flex items-center justify-center gap-3 border border-gray-300 py-2.5 rounded-lg hover:bg-gray-50 active:scale-[0.98] transition-all duration-150 shadow-sm"
+            >
+              <FcGoogle size={22} />
+              <span className="text-gray-700 font-medium">
+                Continue with Google
+              </span>
+            </button>
 
-      {/* Register Link */}
+            <div className="relative -mt-11 opacity-0 pointer-events-auto">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={() => toast.error("Google Login Failed")}
+                useOneTap={false}
+              />
+            </div>
+          </div>
+        </div>
+      </GoogleOAuthProvider>
+
       <p className="text-center text-sm text-gray-600 mt-6">
         Don't have an account?{" "}
         <Link
