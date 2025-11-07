@@ -1,5 +1,13 @@
 import { useEffect, useState } from "react";
-import { FiEdit2, FiTrash2, FiEye, FiPlus, FiInbox } from "react-icons/fi";
+import {
+  FiEdit2,
+  FiTrash2,
+  FiEye,
+  FiPlus,
+  FiInbox,
+  FiBox,
+  FiTag,
+} from "react-icons/fi";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { fetchUserProducts, deleteProductById } from "../../api/product";
@@ -53,27 +61,27 @@ const SellerDashboard = () => {
     <div className="min-h-screen bg-linear-to-br from-gray-50 via-white to-gray-100 py-12 px-6 md:px-14">
       <div className="max-w-7xl mx-auto">
         {/* === HEADER === */}
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-12">
+        <div className="bg-linear-to-r from-indigo-600 to-blue-600 rounded-3xl shadow-xl text-white p-8 md:p-10 mb-12 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800 tracking-tight">
+            <h1 className="text-3xl font-bold tracking-tight">
               Seller Dashboard
             </h1>
-            <p className="text-gray-500 mt-2">
-              Manage your store, view incoming requests, and track your sales.
+            <p className="text-indigo-100 mt-2 max-w-lg">
+              Manage your store, monitor listings, and track sales performance
+              all in one place.
             </p>
           </div>
-
           <div className="flex flex-wrap gap-3">
             <Link
               to="/seller/requests"
-              className="flex items-center gap-2 bg-purple-600 text-white px-5 py-2.5 rounded-lg hover:bg-purple-700 transition-all shadow-lg hover:shadow-xl"
+              className="flex items-center gap-2 bg-white/15 text-white px-5 py-2.5 rounded-lg backdrop-blur-md hover:bg-white/25 transition-all shadow-md hover:shadow-lg"
             >
               <FiInbox className="text-lg" /> View Requests
             </Link>
 
             <Link
               to="/create-product"
-              className="flex items-center gap-2 bg-indigo-600 text-white px-5 py-2.5 rounded-lg hover:bg-indigo-700 transition-all shadow-lg hover:shadow-xl"
+              className="flex items-center gap-2 bg-yellow-400 text-gray-900 px-5 py-2.5 rounded-lg font-medium hover:bg-yellow-300 transition-all shadow-md hover:shadow-lg"
             >
               <FiPlus className="text-lg" /> Add Product
             </Link>
@@ -85,22 +93,26 @@ const SellerDashboard = () => {
           <MetricCard
             title="Total Products"
             value={products.length}
-            color="text-gray-800"
+            icon={<FiBox className="text-indigo-600 text-2xl" />}
+            accent="from-indigo-500/10 to-indigo-500/5"
           />
           <MetricCard
             title="Active Listings"
             value={products.filter((p) => p.available).length}
-            color="text-green-600"
+            icon={<FiTag className="text-green-600 text-2xl" />}
+            accent="from-green-500/10 to-green-500/5"
           />
           <MetricCard
             title="Pending Approvals"
             value="0"
-            color="text-yellow-500"
+            icon={<FiInbox className="text-yellow-500 text-2xl" />}
+            accent="from-yellow-400/10 to-yellow-400/5"
           />
           <MetricCard
             title="Categories"
             value={[...new Set(products.map((p) => p.category))].length}
-            color="text-indigo-600"
+            icon={<FiEdit2 className="text-purple-600 text-2xl" />}
+            accent="from-purple-500/10 to-purple-500/5"
           />
         </div>
 
@@ -125,24 +137,31 @@ const SellerDashboard = () => {
 
 // === Reusable UI Components ===
 
-const MetricCard = ({ title, value, color }) => (
-  <div className="bg-white shadow-sm border border-gray-100 rounded-xl p-5 hover:shadow-md transition">
-    <p className="text-gray-500 text-sm">{title}</p>
-    <h2 className={`text-2xl font-semibold mt-2 ${color}`}>{value}</h2>
+const MetricCard = ({ title, value, icon, accent }) => (
+  <div
+    className={`bg-linear-to-br ${accent} shadow-sm border border-gray-100 rounded-2xl p-6 hover:shadow-lg transition-all duration-300`}
+  >
+    <div className="flex items-center justify-between">
+      <div>
+        <p className="text-gray-600 text-sm font-medium">{title}</p>
+        <h2 className="text-3xl font-semibold text-gray-800 mt-2">{value}</h2>
+      </div>
+      <div className="p-3 bg-white shadow-inner rounded-xl">{icon}</div>
+    </div>
   </div>
 );
 
 const EmptyState = () => (
-  <div className="text-center mt-24">
-    <h2 className="text-xl font-semibold text-gray-700 mb-3">
-      No products yet
+  <div className="text-center mt-28">
+    <h2 className="text-2xl font-semibold text-gray-800 mb-3">
+      No products yet 😔
     </h2>
     <p className="text-gray-500 mb-6">
-      Add your first product to start selling!
+      Add your first product to start your selling journey!
     </p>
     <Link
       to="/create-product"
-      className="bg-indigo-600 text-white px-6 py-2.5 rounded-lg hover:bg-indigo-700 transition shadow-md"
+      className="bg-indigo-600 text-white px-6 py-2.5 rounded-lg hover:bg-indigo-700 transition shadow-md hover:shadow-xl"
     >
       Add Product
     </Link>
@@ -150,7 +169,7 @@ const EmptyState = () => (
 );
 
 const ProductCard = ({ product, onDelete }) => (
-  <div className="group bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 overflow-hidden">
+  <div className="group bg-white/90 backdrop-blur-md rounded-2xl shadow-md border border-gray-100 hover:shadow-2xl transition-all duration-300 overflow-hidden">
     <div className="relative">
       <img
         src={
@@ -160,7 +179,7 @@ const ProductCard = ({ product, onDelete }) => (
         alt={product.title}
         className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-500"
       />
-      <span className="absolute top-3 right-3 bg-gray-100 text-gray-700 text-xs font-medium px-3 py-1 rounded-full border border-gray-200">
+      <span className="absolute top-3 right-3 bg-white/80 text-gray-700 text-xs font-medium px-3 py-1 rounded-full shadow-sm">
         {product.category}
       </span>
     </div>
@@ -175,26 +194,26 @@ const ProductCard = ({ product, onDelete }) => (
         </p>
       </div>
 
-      <div className="flex items-center justify-between pt-2 border-t border-gray-100 mt-auto">
+      <div className="flex items-center justify-between pt-3 border-t border-gray-100 mt-auto">
         <span className="text-indigo-600 font-bold text-lg">
           ₹{product.price}
         </span>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           <Link
             to={`/seller/product/${product._id}`}
-            className="text-gray-600 hover:text-indigo-600"
+            className="text-gray-500 hover:text-indigo-600 transition"
           >
             <FiEye className="text-lg" />
           </Link>
           <Link
             to={`/edit-product/${product._id}`}
-            className="text-gray-600 hover:text-green-600"
+            className="text-gray-500 hover:text-green-600 transition"
           >
             <FiEdit2 className="text-lg" />
           </Link>
           <button
             onClick={() => onDelete(product._id)}
-            className="text-gray-600 hover:text-red-600"
+            className="text-gray-500 hover:text-red-600 transition"
           >
             <FiTrash2 className="text-lg" />
           </button>

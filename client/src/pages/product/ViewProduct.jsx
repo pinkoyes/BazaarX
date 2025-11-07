@@ -18,9 +18,9 @@ const ViewProduct = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [liked, setLiked] = useState(false);
-  const [currentImage, setCurrentImage] = useState(0);
+  const [currentMedia, setCurrentMedia] = useState(0);
 
-  // === Fetch product details ===
+  // === Fetch Product ===
   const {
     data: product,
     isLoading,
@@ -56,128 +56,160 @@ const ViewProduct = () => {
       </div>
     );
 
-  const handleChat = () => {
-    // if (!product.available) {
-    //   toast.error("This product is no longer available!");
-    //   return;
-    // }
-    chatMutation.mutate();
-  };
-
+  // === Handlers ===
   const handleLike = () => {
     setLiked((prev) => !prev);
     toast.success(liked ? "Removed from favorites" : "Added to favorites");
   };
 
-  const nextImage = () =>
-    setCurrentImage((prev) =>
+  const handleChat = () => chatMutation.mutate();
+  const handlePlaceOrder = () => navigate(`/checkout/${id}`);
+  const nextMedia = () =>
+    setCurrentMedia((prev) =>
       prev === product.media.length - 1 ? 0 : prev + 1
     );
-
-  const prevImage = () =>
-    setCurrentImage((prev) =>
+  const prevMedia = () =>
+    setCurrentMedia((prev) =>
       prev === 0 ? product.media.length - 1 : prev - 1
     );
 
-  const handlePlaceOrder = () => {
-    navigate(`/checkout/${id}`);
-  };
-
   return (
-    <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-12">
-      <div className="max-w-6xl mx-auto bg-white shadow-lg rounded-2xl overflow-hidden border border-gray-100">
-        {/* ===== Image Section ===== */}
-        <div className="relative bg-gray-100">
+    <div className="min-h-screen bg-linear-to-br from-gray-50 via-white to-gray-100 py-10 px-4 sm:px-6 lg:px-12">
+      <div className="max-w-6xl mx-auto bg-white/90 backdrop-blur-md shadow-2xl rounded-3xl overflow-hidden border border-gray-100">
+        {/* === Product Header === */}
+        <div className="relative bg-linear-to-r from-indigo-600 to-blue-500 p-8 md:p-10 text-white flex flex-col md:flex-row items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-bold mb-1">
+              {product.title}
+            </h1>
+            <p className="text-blue-100 font-medium text-sm capitalize">
+              {product.category}
+            </p>
+          </div>
+
+          <div className="flex flex-col items-center md:items-end">
+            <p className="text-4xl font-extrabold text-yellow-300">
+              ₹{product.price?.toLocaleString()}
+            </p>
+            <span
+              className={`mt-2 px-3 py-1 text-xs font-medium rounded-full ${
+                product.available
+                  ? "bg-green-200 text-green-800"
+                  : "bg-red-200 text-red-800"
+              }`}
+            >
+              {product.available ? "Available" : "Sold Out"}
+            </span>
+          </div>
+        </div>
+
+        {/* === Media Section === */}
+        <div className="relative bg-gray-50 flex flex-col items-center justify-center overflow-hidden">
           {product.media && product.media.length > 0 ? (
             <>
-              <img
-                src={product.media[currentImage].url}
-                alt={product.title}
-                className="w-full h-[400px] sm:h-[500px] object-contain bg-gray-50 transition-all duration-500"
-              />
+              {product.media[currentMedia].type === "image" ? (
+                <img
+                  src={product.media[currentMedia].url}
+                  alt={product.title}
+                  className="w-full max-h-[480px] object-contain bg-white transition-all duration-700 hover:scale-[1.02]"
+                />
+              ) : (
+                <video
+                  src={product.media[currentMedia].url}
+                  controls
+                  className="w-full max-h-[480px] bg-black object-contain"
+                />
+              )}
+
               {/* Carousel Controls */}
               {product.media.length > 1 && (
                 <>
                   <button
-                    onClick={prevImage}
-                    className="absolute top-1/2 left-3 -translate-y-1/2 bg-white p-2 rounded-full shadow hover:scale-105 transition"
+                    onClick={prevMedia}
+                    className="absolute left-6 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-md p-3 rounded-full shadow-md hover:bg-white hover:scale-110 transition"
                   >
                     <IoChevronBack size={22} />
                   </button>
                   <button
-                    onClick={nextImage}
-                    className="absolute top-1/2 right-3 -translate-y-1/2 bg-white p-2 rounded-full shadow hover:scale-105 transition"
+                    onClick={nextMedia}
+                    className="absolute right-6 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-md p-3 rounded-full shadow-md hover:bg-white hover:scale-110 transition"
                   >
                     <IoChevronForward size={22} />
                   </button>
                 </>
               )}
+
+              {/* Thumbnails */}
+              {product.media.length > 1 && (
+                <div className="flex justify-center mt-4 gap-3">
+                  {product.media.map((m, index) => (
+                    <img
+                      key={index}
+                      src={m.url}
+                      alt={`thumb-${index}`}
+                      onClick={() => setCurrentMedia(index)}
+                      className={`w-16 h-16 object-cover rounded-lg border-2 cursor-pointer transition-all ${
+                        index === currentMedia
+                          ? "border-blue-500 scale-105"
+                          : "border-transparent opacity-70 hover:opacity-100"
+                      }`}
+                    />
+                  ))}
+                </div>
+              )}
             </>
           ) : (
             <div className="w-full h-[400px] flex items-center justify-center text-gray-400">
-              No Image Available
+              No Media Available
             </div>
           )}
 
           {/* Like Button */}
           <button
             onClick={handleLike}
-            className={`absolute top-4 left-4 p-2 rounded-full shadow-md transition ${
-              liked ? "bg-red-500 text-white" : "bg-white text-gray-700"
+            className={`absolute top-5 left-5 p-3 rounded-full shadow-lg transition-all backdrop-blur-sm ${
+              liked
+                ? "bg-red-500 text-white scale-110"
+                : "bg-white/90 text-gray-700 hover:scale-105"
             }`}
           >
             <FiHeart size={20} />
           </button>
-
-          {/* Sold Tag */}
-          {!product.available && (
-            <span className="absolute top-4 right-4 bg-red-600 text-white px-3 py-1 text-xs rounded-full uppercase">
-              Sold
-            </span>
-          )}
         </div>
 
-        {/* ===== Product Info ===== */}
-        <div className="p-8 grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Product Details */}
-          <div className="md:col-span-2">
-            <h1 className="text-3xl font-semibold text-gray-900 mb-2">
-              {product.title}
-            </h1>
-            <p className="text-blue-600 text-2xl font-bold mb-4">
-              ₹{product.price?.toLocaleString()}
-            </p>
-
-            <div className="flex items-center text-gray-600 mb-3">
-              <FiMapPin className="mr-2 text-gray-400" />
+        {/* === Product Details === */}
+        <div className="p-10 grid grid-cols-1 md:grid-cols-3 gap-10">
+          {/* Left Section - Info */}
+          <div className="md:col-span-2 space-y-6">
+            <div className="flex items-center text-gray-600 gap-2">
+              <FiMapPin className="text-blue-600" />
               <span>{product.location || "Location not available"}</span>
             </div>
 
-            <p className="text-gray-700 leading-relaxed mb-6">
+            <p className="text-gray-700 leading-relaxed text-lg">
               {product.description || "No description provided."}
             </p>
 
-            <div className="flex flex-wrap gap-3 text-sm">
-              <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full">
-                Category: {product.category || "N/A"}
+            <div className="flex flex-wrap gap-3 text-sm mt-6">
+              <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full">
+                Posted on{" "}
+                {new Date(product.createdAt).toLocaleDateString("en-IN")}
               </span>
-              {product.createdAt && (
-                <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full">
-                  Posted on{" "}
-                  {new Date(product.createdAt).toLocaleDateString("en-IN")}
-                </span>
-              )}
+              <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full">
+                Category: {product.category}
+              </span>
             </div>
           </div>
 
-          {/* Seller Info */}
-          <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 shadow-sm">
-            <h3 className="text-lg font-semibold mb-4 text-gray-800">
-              Seller Information
+          {/* Right Section - Seller Info */}
+          <div className="bg-linear-to-b from-white/90 to-gray-50 border border-gray-200 rounded-2xl p-6 shadow-md">
+            <h3 className="text-xl font-semibold mb-4 text-gray-800 flex items-center gap-2">
+              <FiUser className="text-blue-600" /> Seller Information
             </h3>
-            <div className="flex items-center gap-4 mb-5">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                <FiUser className="text-blue-600 text-xl" />
+
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-14 h-14 bg-linear-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center shadow-inner">
+                <FiUser className="text-blue-600 text-2xl" />
               </div>
               <div>
                 <p className="font-semibold text-gray-800">
@@ -188,10 +220,11 @@ const ViewProduct = () => {
                 </p>
               </div>
             </div>
+
             <button
               onClick={handleChat}
               disabled={chatMutation.isPending}
-              className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition shadow disabled:opacity-70"
+              className="w-full flex items-center justify-center gap-2 bg-linear-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-lg font-medium hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md hover:shadow-xl hover:scale-[1.02] disabled:opacity-70"
             >
               <FiMessageCircle size={18} />
               {chatMutation.isPending ? "Starting Chat..." : "Chat with Seller"}
@@ -199,14 +232,14 @@ const ViewProduct = () => {
           </div>
         </div>
 
-        {/* ===== Buy Section ===== */}
-        <div className="border-t border-gray-200 p-6 bg-gray-50 flex flex-col sm:flex-row justify-between items-center gap-4">
+        {/* === Buy Section === */}
+        <div className="border-t border-gray-200 p-8 bg-white/80 flex flex-col sm:flex-row justify-between items-center gap-4 backdrop-blur-md">
           <h2 className="text-lg font-medium text-gray-800 text-center sm:text-left">
             Ready to buy this product?
           </h2>
           <button
             onClick={handlePlaceOrder}
-            className="flex items-center justify-center gap-2 bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 transition shadow-md cursor-pointer"
+            className="flex items-center justify-center gap-2 bg-linear-to-r from-green-600 to-emerald-600 text-white px-8 py-3 rounded-lg font-medium hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg hover:shadow-2xl hover:scale-[1.02]"
           >
             <FiShoppingCart size={18} /> Place Order
           </button>
