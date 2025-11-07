@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
 
 const LandingPage = () => {
@@ -8,57 +9,90 @@ const LandingPage = () => {
   if (isAuthenticated) navigate("/home");
 
   return (
-    <div className="relative w-full h-screen overflow-hidden bg-linear-to-br from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center text-white">
-      {/* ===== Abstract Floating Shapes ===== */}
-      <div className="absolute -top-32 -left-32 w-96 h-96 bg-purple-400 rounded-full opacity-20 blur-3xl animate-pulseSlow"></div>
-      <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-yellow-400 rounded-full opacity-20 blur-3xl animate-pulseSlow delay-500"></div>
+    <div className="relative w-full min-h-[calc(100vh-7rem)] bg-linear-to-br from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center text-white overflow-hidden">
+      {/* ===== Background Blobs ===== */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 0.25, scale: 1 }}
+        transition={{ duration: 2 }}
+        className="absolute -top-32 -left-32 w-md h-112 bg-purple-400 rounded-full blur-3xl"
+      ></motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 0.25, scale: 1 }}
+        transition={{ duration: 2, delay: 0.5 }}
+        className="absolute -bottom-40 -right-40 w-120 h-120 bg-yellow-400 rounded-full blur-3xl"
+      ></motion.div>
 
       {/* ===== Hero Content ===== */}
-      <div className="relative bottom-20 z-10 text-center max-w-3xl px-6 sm:px-10 md:px-16">
-        <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold leading-tight mb-6 animate-fadeIn drop-shadow-lg">
+      <div className="relative z-10 text-center px-6 sm:px-10 md:px-16 max-w-4xl">
+        <motion.h1
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1 }}
+          className="text-4xl sm:text-6xl md:text-7xl font-extrabold leading-tight mb-6 tracking-tight drop-shadow-lg"
+        >
           Discover, <span className="text-yellow-400">Buy</span> &{" "}
           <span className="text-yellow-400">Sell</span> Effortlessly
-        </h1>
+        </motion.h1>
 
-        <p className="text-base sm:text-lg md:text-xl text-white/80 mb-10 animate-fadeIn delay-200 leading-relaxed">
-          Connect with a vibrant community and find treasures at your
-          fingertips. Trade anything, anytime, anywhere — all in one secure
-          place.
-        </p>
+        <motion.p
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.2 }}
+          className="text-base sm:text-lg md:text-xl text-white/90 mb-10 leading-relaxed max-w-2xl mx-auto"
+        >
+          Join a vibrant community where trading feels natural. Explore
+          thousands of products, connect directly with sellers, and enjoy a
+          seamless shopping experience — all on{" "}
+          <span className="font-semibold text-yellow-300">BazaarX</span>.
+        </motion.p>
 
-        <div className="flex flex-col sm:flex-row justify-center gap-4 animate-fadeIn delay-400">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="flex flex-col sm:flex-row justify-center gap-4"
+        >
           <Link
             to="/auth/register"
-            className="bg-yellow-400 text-gray-900 font-semibold px-8 py-3 rounded-lg shadow-md hover:bg-yellow-500 hover:scale-105 transition-all duration-300"
+            className="bg-yellow-400 text-gray-900 font-semibold px-10 py-3 rounded-lg shadow-lg hover:bg-yellow-500 hover:scale-105 transition-all duration-300"
           >
             Get Started
           </Link>
           <Link
             to="/learn-more"
-            className="border-2 border-white text-white font-semibold px-8 py-3 rounded-lg shadow-md hover:bg-white hover:text-gray-900 hover:scale-105 transition-all duration-300"
+            className="border-2 border-white text-white font-semibold px-10 py-3 rounded-lg shadow-lg hover:bg-white hover:text-gray-900 hover:scale-105 transition-all duration-300"
           >
             Learn More
           </Link>
-        </div>
+        </motion.div>
       </div>
 
-      {/* ===== Custom Animations ===== */}
-      <style>{`
-        @keyframes fadeIn {
-          0% { opacity: 0; transform: translateY(20px); }
-          100% { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fadeIn { animation: fadeIn 1s ease forwards; }
-        .animate-fadeIn.delay-200 { animation-delay: 0.2s; }
-        .animate-fadeIn.delay-400 { animation-delay: 0.4s; }
+      {/* ===== Subtle Floating Elements ===== */}
+      <motion.img
+        src="https://cdn-icons-png.flaticon.com/512/711/711239.png"
+        alt="Shopping Icon"
+        initial={{ opacity: 0, y: 80 }}
+        animate={{ opacity: 0.15, y: [80, 100, 80] }}
+        transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
+        className="absolute bottom-10 left-10 w-20 sm:w-28 pointer-events-none select-none"
+      />
 
-        @keyframes pulseSlow {
-          0%, 100% { transform: scale(1); opacity: 0.2; }
-          50% { transform: scale(1.3); opacity: 0.35; }
-        }
-        .animate-pulseSlow { animation: pulseSlow 10s ease-in-out infinite; }
-        .animate-pulseSlow.delay-500 { animation-delay: 3s; }
-      `}</style>
+      <motion.img
+        src="https://cdn-icons-png.flaticon.com/512/1170/1170627.png"
+        alt="Cart Icon"
+        initial={{ opacity: 0, y: -60 }}
+        animate={{ opacity: 0.15, y: [-60, -80, -60] }}
+        transition={{
+          repeat: Infinity,
+          duration: 5,
+          delay: 1,
+          ease: "easeInOut",
+        }}
+        className="absolute top-16 right-16 w-16 sm:w-24 pointer-events-none select-none"
+      />
     </div>
   );
 };

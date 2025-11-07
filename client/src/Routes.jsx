@@ -16,6 +16,8 @@ import CheckoutPage from "./pages/product/CheckoutPage";
 import MyOrder from "./pages/orders/MyOrder";
 import SellerRequests from "./pages/dashboard/SellerRequests";
 import ChatPage from "./pages/chat/ChatPage";
+import ProtectedRoute from "./components/ProtectedRoute";
+import PublicRoute from "./components/PublicRoute";
 
 const router = createBrowserRouter([
   {
@@ -25,51 +27,99 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <LandingPage />,
+        element: (
+          <PublicRoute>
+            <LandingPage />
+          </PublicRoute>
+        ),
       },
       {
         path: "home",
-        element: <Home />,
+        element: (
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "seller-dashboard",
-        element: <SellerDashboard />,
+        element: (
+          <ProtectedRoute>
+            <SellerDashboard />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "create-product",
-        element: <CreateProduct />,
+        element: (
+          <ProtectedRoute>
+            <CreateProduct />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "seller/product/:id",
-        element: <ViewSellerProduct />,
+        element: (
+          <ProtectedRoute>
+            <ViewSellerProduct />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "product/:id",
-        element: <ViewProduct />,
+        element: (
+          <ProtectedRoute>
+            <ViewProduct />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "edit-product/:id",
-        element: <UpdateProduct />,
+        element: (
+          <ProtectedRoute>
+            <UpdateProduct />
+          </ProtectedRoute>
+        ),
       },
       {
-        path: "/category/:categoryName",
-        element: <CategoryPage />,
+        path: "category/:categoryName",
+        element: (
+          <ProtectedRoute>
+            <CategoryPage />
+          </ProtectedRoute>
+        ),
       },
       {
-        path: "/checkout/:productId",
-        element: <CheckoutPage />,
+        path: "checkout/:productId",
+        element: (
+          <ProtectedRoute>
+            <CheckoutPage />
+          </ProtectedRoute>
+        ),
       },
       {
-        path: "/my-orders",
-        element: <MyOrder />,
+        path: "my-orders",
+        element: (
+          <ProtectedRoute>
+            <MyOrder />
+          </ProtectedRoute>
+        ),
       },
       {
-        path: "/seller/requests",
-        element: <SellerRequests />,
+        path: "seller/requests",
+        element: (
+          <ProtectedRoute>
+            <SellerRequests />
+          </ProtectedRoute>
+        ),
       },
       {
-        path: "/chat/:chatRoomId",
-        element: <ChatPage />,
+        path: "chat/:chatRoomId",
+        element: (
+          <ProtectedRoute>
+            <ChatPage />
+          </ProtectedRoute>
+        ),
       },
     ],
   },
@@ -79,11 +129,19 @@ const router = createBrowserRouter([
     children: [
       {
         path: "login",
-        element: <Login />,
+        element: (
+          <PublicRoute>
+            <Login />
+          </PublicRoute>
+        ),
       },
       {
         path: "register",
-        element: <Register />,
+        element: (
+          <PublicRoute>
+            <Register />
+          </PublicRoute>
+        ),
       },
     ],
   },
