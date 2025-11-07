@@ -9,7 +9,7 @@ const ProtectedRoute = ({ children }) => {
   if (initializing) return <Spinner />;
 
   if (!isAuthenticated) {
-    return <Navigate to="/auth/login" replace state={{ from: location }} />;
+    return <Navigate to="/" replace state={{ from: location }} />;
   }
 
   return children;

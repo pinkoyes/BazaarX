@@ -20,8 +20,8 @@ export const AuthProvider = ({ children }) => {
   const fetchCurrentUser = async () => {
     try {
       setInitializing(true);
-      const res = await currentUser();
-      const current = res?.data?.user || null;
+      const data = await currentUser();
+      const current = data?.user || null;
       setUser(current);
       if (current) {
         localStorage.setItem("user", JSON.stringify(current));
@@ -50,11 +50,11 @@ export const AuthProvider = ({ children }) => {
     fetchCurrentUser();
   }, []);
 
-  const registerUser = async (data) => {
+  const registerUser = async (registerPayload) => {
     setLoading(true);
     try {
-      const res = await register(data);
-      const newUser = res?.data?.user;
+      const data = await register(registerPayload);
+      const newUser = data?.user;
       setUser(newUser);
       localStorage.setItem("user", JSON.stringify(newUser));
       toast.success("Registration successful!");
@@ -68,11 +68,11 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const loginUser = async (data) => {
+  const loginUser = async (loginPayload) => {
     setLoading(true);
     try {
-      const res = await login(data);
-      const loggedInUser = res?.data?.user;
+      const data = await login(loginPayload);
+      const loggedInUser = data?.user;
       setUser(loggedInUser);
       localStorage.setItem("user", JSON.stringify(loggedInUser));
       toast.success("Login successful!");
@@ -103,8 +103,8 @@ export const AuthProvider = ({ children }) => {
   const googleLoginUser = async (token) => {
     setLoading(true);
     try {
-      const res = await googleAuthApi(token);
-      const googleUser = res?.data?.user;
+      const data = await googleAuthApi(token);
+      const googleUser = data?.user;
       setUser(googleUser);
       localStorage.setItem("user", JSON.stringify(googleUser));
       toast.success("Google login successful!");

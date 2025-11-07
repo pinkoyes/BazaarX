@@ -2,12 +2,12 @@ import api from "./api";
 
 export const register = async (data) => {
   const res = await api.post("/auth/register", data);
-  return res.data;
+  return res.data?.data;
 };
 
 export const login = async (data) => {
   const res = await api.post("/auth/login", data);
-  return res.data;
+  return res.data?.data;
 };
 
 export const logout = async () => {
@@ -17,10 +17,10 @@ export const logout = async () => {
 
 export const currentUser = async () => {
   const res = await api.get("/auth/me");
-  return res.data;
+  return res.data?.data;
 };
 
 export const googleAuthApi = async (googleAuthToken) => {
   const res = await api.post("/auth/google", { googleAuthToken });
-  return res.data;
+  return res.data?.data;
 };
