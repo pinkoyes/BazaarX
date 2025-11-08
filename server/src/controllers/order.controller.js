@@ -34,8 +34,6 @@ export const placeOrder = asyncHandler(async (req, res) => {
     deliveryAddress,
   });
 
-  await Product.findByIdAndUpdate(product._id, { $set: { available: false } });
-
   return res
     .status(201)
     .json(new ApiResponse(201, order, "Order placed successfully"));
@@ -102,9 +100,9 @@ export const OrderStatus = asyncHandler(async (req, res) => {
   order.status = status;
   await order.save();
 
-  if (status === "rejected") {
+  if (status === "accepted") {
     await Product.findByIdAndUpdate(order.productId, {
-      $set: { available: true },
+      $set: { available: false },
     });
   }
 

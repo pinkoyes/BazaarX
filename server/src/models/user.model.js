@@ -37,7 +37,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       select: false,
       required: function () {
-        this.authProvider === "local";
+        return this.authProvider === "local";
       },
     },
     role: {
