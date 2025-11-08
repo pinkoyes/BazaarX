@@ -51,7 +51,9 @@ export const myOrders = asyncHandler(async (req, res) => {
     .populate("sellerId", "fullName email phoneNumber");
 
   if (!orders || orders.length === 0) {
-    throw new ApiError(404, "No order is placed by you yet.");
+    return res
+      .status(200)
+      .json(new ApiResponse(200, [], "No orders found for this user"));
   }
 
   return res

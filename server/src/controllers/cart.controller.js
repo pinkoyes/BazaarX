@@ -42,15 +42,16 @@ export const addToCart = asyncHandler(async (req, res) => {
 });
 
 export const myCart = asyncHandler(async (req, res) => {
+  console.log("dot");
   const userId = req.user._id;
 
-  const carts = await Cart.findOne({ userId }).populate("items.productId");
+  let cart = await Cart.findOne({ userId }).populate("items.productId");
 
-  if (!carts) {
-    throw new ApiError(404, "Cart not found");
+  if (!cart) {
+    cart = await Cart.create({ userId, items: [] });
   }
 
-  return res.status(200).json(new ApiResponse(200, carts, "Fetch all carts"));
+  return res.status(200).json(new ApiResponse(200, cart, "Fetch all carts"));
 });
 
 export const removeCart = asyncHandler(async (req, res) => {
