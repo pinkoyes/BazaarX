@@ -80,7 +80,7 @@ const CartPage = () => {
 
   if (cartItems.length === 0)
     return (
-      <div className="flex flex-col items-center justify-center h-[70vh] text-gray-700">
+      <div className="flex flex-col gap-4 items-center justify-center h-[70vh] text-gray-700">
         <FiShoppingCart size={60} className="mb-4 text-gray-500" />
         <h2 className="text-3xl font-semibold mb-3">Your cart is empty 🛒</h2>
         <Link

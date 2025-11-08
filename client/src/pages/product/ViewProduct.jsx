@@ -7,7 +7,6 @@ import {
   FiMapPin,
   FiUser,
   FiMessageCircle,
-  FiHeart,
   FiShoppingCart,
 } from "react-icons/fi";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
@@ -17,7 +16,6 @@ import toast from "react-hot-toast";
 const ViewProduct = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [liked, setLiked] = useState(false);
   const [currentMedia, setCurrentMedia] = useState(0);
 
   // === Fetch Product ===
@@ -57,11 +55,6 @@ const ViewProduct = () => {
     );
 
   // === Handlers ===
-  const handleLike = () => {
-    setLiked((prev) => !prev);
-    toast.success(liked ? "Removed from favorites" : "Added to favorites");
-  };
-
   const handleChat = () => chatMutation.mutate();
   const handlePlaceOrder = () => navigate(`/checkout/${id}`);
   const nextMedia = () =>
@@ -75,20 +68,20 @@ const ViewProduct = () => {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-gray-50 via-white to-indigo-50 py-12 px-4 sm:px-8 lg:px-14">
-      <div className="max-w-6xl mx-auto bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
+      <div className="max-w-6xl mx-auto bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
         {/* === Product Header === */}
         <div className="relative bg-linear-to-r from-indigo-600 to-blue-500 p-8 md:p-12 text-white flex flex-col md:flex-row items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl md:text-4xl font-extrabold mb-2">
+            <h1 className="text-3xl md:text-4xl font-extrabold mb-2 tracking-tight">
               {product.title}
             </h1>
-            <p className="text-indigo-100 text-sm uppercase tracking-wide">
+            <p className="text-indigo-100 text-sm uppercase tracking-widest">
               {product.category}
             </p>
           </div>
 
           <div className="flex flex-col items-center md:items-end">
-            <p className="text-4xl font-extrabold text-yellow-300">
+            <p className="text-4xl font-extrabold text-yellow-300 drop-shadow-sm">
               ₹{product.price?.toLocaleString()}
             </p>
             <span
@@ -111,7 +104,7 @@ const ViewProduct = () => {
                 <img
                   src={product.media[currentMedia].url}
                   alt={product.title}
-                  className="w-full max-h-[500px] object-contain bg-white transition-transform duration-700 hover:scale-[1.03]"
+                  className="w-full max-h-[500px] object-contain bg-white transition-transform duration-700 hover:scale-[1.02]"
                 />
               ) : (
                 <video
@@ -141,7 +134,7 @@ const ViewProduct = () => {
 
               {/* Thumbnails */}
               {product.media.length > 1 && (
-                <div className="flex justify-center mt-5 gap-3">
+                <div className="flex justify-center mt-5 gap-3 flex-wrap">
                   {product.media.map((m, index) => (
                     <img
                       key={index}
@@ -163,18 +156,6 @@ const ViewProduct = () => {
               No Media Available
             </div>
           )}
-
-          {/* Like Button */}
-          <button
-            onClick={handleLike}
-            className={`absolute top-5 left-5 p-3 rounded-full shadow-lg transition-all backdrop-blur-md ${
-              liked
-                ? "bg-red-500 text-white scale-110"
-                : "bg-white/90 text-gray-700 hover:scale-105"
-            }`}
-          >
-            <FiHeart size={20} />
-          </button>
         </div>
 
         {/* === Product Details === */}
@@ -224,7 +205,7 @@ const ViewProduct = () => {
             <button
               onClick={handleChat}
               disabled={chatMutation.isPending}
-              className="w-full flex items-center justify-center gap-2 bg-linear-to-r from-indigo-600 to-blue-600 text-white py-3 rounded-xl font-semibold hover:from-indigo-700 hover:to-blue-700 transition-all shadow-md hover:shadow-xl hover:scale-[1.02] disabled:opacity-70"
+              className="w-full flex items-center justify-center gap-2 bg-linear-to-r from-indigo-600 to-blue-600 text-white py-3 rounded-xl font-semibold hover:from-indigo-700 hover:to-blue-700 transition-all shadow-md hover:shadow-xl hover:scale-[1.02] disabled:opacity-70 cursor-pointer"
             >
               <FiMessageCircle size={18} />
               {chatMutation.isPending ? "Starting Chat..." : "Chat with Seller"}
@@ -239,7 +220,7 @@ const ViewProduct = () => {
           </h2>
           <button
             onClick={handlePlaceOrder}
-            className="flex items-center justify-center gap-2 bg-linear-to-r from-emerald-600 to-green-600 text-white px-8 py-3 rounded-xl font-semibold hover:from-emerald-700 hover:to-green-700 transition-all shadow-lg hover:shadow-2xl hover:scale-[1.02]"
+            className="flex items-center justify-center gap-2 bg-linear-to-r from-emerald-600 to-green-600 text-white px-8 py-3 rounded-xl font-semibold hover:from-emerald-700 hover:to-green-700 transition-all shadow-lg hover:shadow-2xl hover:scale-[1.02] cursor-pointer"
           >
             <FiShoppingCart size={18} /> Place Order
           </button>

@@ -195,7 +195,7 @@ const CheckoutPage = () => {
             <button
               onClick={handlePlaceOrder}
               disabled={orderMutation.isPending}
-              className="w-full bg-linear-to-r from-indigo-600 to-blue-600 text-white py-3 rounded-xl font-semibold text-lg hover:from-indigo-700 hover:to-blue-700 transition-all shadow-md hover:shadow-lg disabled:opacity-60"
+              className="w-full bg-linear-to-r from-indigo-600 to-blue-600 text-white py-3 rounded-xl font-semibold text-lg hover:from-indigo-700 hover:to-blue-700 transition-all shadow-md hover:shadow-lg disabled:opacity-60 cursor-pointer"
             >
               {orderMutation.isPending
                 ? "Processing Order..."
