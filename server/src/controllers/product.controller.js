@@ -209,3 +209,26 @@ export const getCategories = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, categories, "Fetched category successfully!"));
 });
+
+export const searchProducts = asyncHandler(async (req, res) => {
+  const { q } = req.query;
+
+  if (!q || q.trim() === "") {
+    throw new ApiError(400, "Search query is required");
+  }
+
+  const regex = new RegExp(q, "i");
+
+  const products = await Product.find({
+    $or: [
+      { title: { $regex: regex } },
+      { description: { $regex: regex } },
+      { category: { $regex: regex } },
+      { location: { $regex: regex } },
+    ],
+  }).populate("ownerId", "fullName email");
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, products, "Search query products"));
+});
