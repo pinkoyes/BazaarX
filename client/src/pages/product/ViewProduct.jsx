@@ -74,15 +74,15 @@ const ViewProduct = () => {
     );
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-gray-50 via-white to-gray-100 py-10 px-4 sm:px-6 lg:px-12">
-      <div className="max-w-6xl mx-auto bg-white/90 backdrop-blur-md shadow-2xl rounded-3xl overflow-hidden border border-gray-100">
+    <div className="min-h-screen bg-linear-to-br from-gray-50 via-white to-indigo-50 py-12 px-4 sm:px-8 lg:px-14">
+      <div className="max-w-6xl mx-auto bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
         {/* === Product Header === */}
-        <div className="relative bg-linear-to-r from-indigo-600 to-blue-500 p-8 md:p-10 text-white flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="relative bg-linear-to-r from-indigo-600 to-blue-500 p-8 md:p-12 text-white flex flex-col md:flex-row items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl md:text-4xl font-bold mb-1">
+            <h1 className="text-3xl md:text-4xl font-extrabold mb-2">
               {product.title}
             </h1>
-            <p className="text-blue-100 font-medium text-sm capitalize">
+            <p className="text-indigo-100 text-sm uppercase tracking-wide">
               {product.category}
             </p>
           </div>
@@ -92,7 +92,7 @@ const ViewProduct = () => {
               ₹{product.price?.toLocaleString()}
             </p>
             <span
-              className={`mt-2 px-3 py-1 text-xs font-medium rounded-full ${
+              className={`mt-2 px-3 py-1 text-xs font-semibold rounded-full ${
                 product.available
                   ? "bg-green-200 text-green-800"
                   : "bg-red-200 text-red-800"
@@ -111,13 +111,13 @@ const ViewProduct = () => {
                 <img
                   src={product.media[currentMedia].url}
                   alt={product.title}
-                  className="w-full max-h-[480px] object-contain bg-white transition-all duration-700 hover:scale-[1.02]"
+                  className="w-full max-h-[500px] object-contain bg-white transition-transform duration-700 hover:scale-[1.03]"
                 />
               ) : (
                 <video
                   src={product.media[currentMedia].url}
                   controls
-                  className="w-full max-h-[480px] bg-black object-contain"
+                  className="w-full max-h-[500px] bg-black object-contain"
                 />
               )}
 
@@ -126,13 +126,13 @@ const ViewProduct = () => {
                 <>
                   <button
                     onClick={prevMedia}
-                    className="absolute left-6 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-md p-3 rounded-full shadow-md hover:bg-white hover:scale-110 transition"
+                    className="absolute left-5 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-md p-3 rounded-full shadow-lg hover:bg-white hover:scale-110 transition"
                   >
                     <IoChevronBack size={22} />
                   </button>
                   <button
                     onClick={nextMedia}
-                    className="absolute right-6 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-md p-3 rounded-full shadow-md hover:bg-white hover:scale-110 transition"
+                    className="absolute right-5 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-md p-3 rounded-full shadow-lg hover:bg-white hover:scale-110 transition"
                   >
                     <IoChevronForward size={22} />
                   </button>
@@ -141,7 +141,7 @@ const ViewProduct = () => {
 
               {/* Thumbnails */}
               {product.media.length > 1 && (
-                <div className="flex justify-center mt-4 gap-3">
+                <div className="flex justify-center mt-5 gap-3">
                   {product.media.map((m, index) => (
                     <img
                       key={index}
@@ -150,7 +150,7 @@ const ViewProduct = () => {
                       onClick={() => setCurrentMedia(index)}
                       className={`w-16 h-16 object-cover rounded-lg border-2 cursor-pointer transition-all ${
                         index === currentMedia
-                          ? "border-blue-500 scale-105"
+                          ? "border-indigo-600 scale-105"
                           : "border-transparent opacity-70 hover:opacity-100"
                       }`}
                     />
@@ -159,7 +159,7 @@ const ViewProduct = () => {
               )}
             </>
           ) : (
-            <div className="w-full h-[400px] flex items-center justify-center text-gray-400">
+            <div className="w-full h-[400px] flex items-center justify-center text-gray-400 text-lg">
               No Media Available
             </div>
           )}
@@ -167,7 +167,7 @@ const ViewProduct = () => {
           {/* Like Button */}
           <button
             onClick={handleLike}
-            className={`absolute top-5 left-5 p-3 rounded-full shadow-lg transition-all backdrop-blur-sm ${
+            className={`absolute top-5 left-5 p-3 rounded-full shadow-lg transition-all backdrop-blur-md ${
               liked
                 ? "bg-red-500 text-white scale-110"
                 : "bg-white/90 text-gray-700 hover:scale-105"
@@ -179,10 +179,10 @@ const ViewProduct = () => {
 
         {/* === Product Details === */}
         <div className="p-10 grid grid-cols-1 md:grid-cols-3 gap-10">
-          {/* Left Section - Info */}
+          {/* Left Section - Product Info */}
           <div className="md:col-span-2 space-y-6">
             <div className="flex items-center text-gray-600 gap-2">
-              <FiMapPin className="text-blue-600" />
+              <FiMapPin className="text-indigo-600" />
               <span>{product.location || "Location not available"}</span>
             </div>
 
@@ -202,14 +202,14 @@ const ViewProduct = () => {
           </div>
 
           {/* Right Section - Seller Info */}
-          <div className="bg-linear-to-b from-white/90 to-gray-50 border border-gray-200 rounded-2xl p-6 shadow-md">
+          <div className="bg-white/90 border border-gray-200 rounded-2xl p-6 shadow-inner backdrop-blur-sm">
             <h3 className="text-xl font-semibold mb-4 text-gray-800 flex items-center gap-2">
-              <FiUser className="text-blue-600" /> Seller Information
+              <FiUser className="text-indigo-600" /> Seller Details
             </h3>
 
             <div className="flex items-center gap-4 mb-6">
               <div className="w-14 h-14 bg-linear-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center shadow-inner">
-                <FiUser className="text-blue-600 text-2xl" />
+                <FiUser className="text-indigo-600 text-2xl" />
               </div>
               <div>
                 <p className="font-semibold text-gray-800">
@@ -224,7 +224,7 @@ const ViewProduct = () => {
             <button
               onClick={handleChat}
               disabled={chatMutation.isPending}
-              className="w-full flex items-center justify-center gap-2 bg-linear-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-lg font-medium hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md hover:shadow-xl hover:scale-[1.02] disabled:opacity-70"
+              className="w-full flex items-center justify-center gap-2 bg-linear-to-r from-indigo-600 to-blue-600 text-white py-3 rounded-xl font-semibold hover:from-indigo-700 hover:to-blue-700 transition-all shadow-md hover:shadow-xl hover:scale-[1.02] disabled:opacity-70"
             >
               <FiMessageCircle size={18} />
               {chatMutation.isPending ? "Starting Chat..." : "Chat with Seller"}
@@ -239,7 +239,7 @@ const ViewProduct = () => {
           </h2>
           <button
             onClick={handlePlaceOrder}
-            className="flex items-center justify-center gap-2 bg-linear-to-r from-green-600 to-emerald-600 text-white px-8 py-3 rounded-lg font-medium hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg hover:shadow-2xl hover:scale-[1.02]"
+            className="flex items-center justify-center gap-2 bg-linear-to-r from-emerald-600 to-green-600 text-white px-8 py-3 rounded-xl font-semibold hover:from-emerald-700 hover:to-green-700 transition-all shadow-lg hover:shadow-2xl hover:scale-[1.02]"
           >
             <FiShoppingCart size={18} /> Place Order
           </button>

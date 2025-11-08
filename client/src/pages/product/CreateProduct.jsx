@@ -33,7 +33,6 @@ const CreateProduct = () => {
       url: URL.createObjectURL(file),
       type: file.type.startsWith("video") ? "video" : "image",
     }));
-
     setMediaFiles((prev) => [...prev, ...files]);
     setPreview((prev) => [...prev, ...newPreviews]);
   };
@@ -74,20 +73,20 @@ const CreateProduct = () => {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-gray-50 to-gray-100 flex items-center justify-center px-4 py-8">
-      <div className="bg-white w-full max-w-3xl rounded-2xl shadow-2xl p-6 md:p-10 transition-all duration-300 hover:shadow-3xl">
-        {/* Header */}
+    <div className="min-h-screen bg-linear-to-br from-indigo-50 via-white to-blue-50 flex items-center justify-center px-4 py-10">
+      <div className="bg-white/90 backdrop-blur-lg w-full max-w-4xl rounded-3xl shadow-xl p-8 md:p-12 transition-all duration-300 hover:shadow-2xl border border-gray-100">
+        {/* ===== Header ===== */}
         <div className="text-center mb-10">
-          <h2 className="text-3xl font-extrabold text-gray-800">
-            🛒 Create New Product
+          <h2 className="text-4xl font-bold text-gray-900">
+            🛍️ Create New Product
           </h2>
-          <p className="text-gray-500 mt-2 text-sm sm:text-base">
-            Fill in the details below to list your product for sale.
+          <p className="text-gray-500 mt-2 text-sm md:text-base max-w-md mx-auto">
+            Fill in the details below to list your product on the marketplace.
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Title */}
+        <form onSubmit={handleSubmit} className="space-y-8">
+          {/* === Title === */}
           <div>
             <label className="block text-gray-700 mb-2 font-medium">
               Product Title
@@ -98,12 +97,12 @@ const CreateProduct = () => {
               value={form.title}
               onChange={handleChange}
               placeholder="Enter a catchy product name"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+              className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all bg-white/80"
               required
             />
           </div>
 
-          {/* Description */}
+          {/* === Description === */}
           <div>
             <label className="block text-gray-700 mb-2 font-medium">
               Description
@@ -113,13 +112,13 @@ const CreateProduct = () => {
               value={form.description}
               onChange={handleChange}
               rows={4}
-              placeholder="Describe your product in detail"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none resize-none transition-all"
+              placeholder="Describe your product in detail..."
+              className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none resize-none transition-all bg-white/80"
             />
           </div>
 
-          {/* Category & Price */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* === Category & Price === */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
               <label className="block text-gray-700 mb-2 font-medium">
                 Category
@@ -130,11 +129,10 @@ const CreateProduct = () => {
                 value={form.category}
                 onChange={handleChange}
                 placeholder="e.g. Electronics, Furniture"
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none bg-white/80"
                 required
               />
             </div>
-
             <div>
               <label className="block text-gray-700 mb-2 font-medium">
                 Price (₹)
@@ -145,13 +143,13 @@ const CreateProduct = () => {
                 value={form.price}
                 onChange={handleChange}
                 placeholder="Enter product price"
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none bg-white/80"
                 required
               />
             </div>
           </div>
 
-          {/* Location */}
+          {/* === Location === */}
           <div>
             <label className="block text-gray-700 mb-2 font-medium">
               Location
@@ -161,21 +159,25 @@ const CreateProduct = () => {
               name="location"
               value={form.location}
               onChange={handleChange}
-              placeholder="Enter city or address"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              placeholder="Enter city or full address"
+              className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none bg-white/80"
               required
             />
           </div>
 
-          {/* Media Upload */}
+          {/* === Media Upload === */}
           <div>
             <label className="block text-gray-700 mb-3 font-medium">
               Upload Media (Images / Videos)
             </label>
-            <label className="flex flex-col items-center justify-center w-full h-18 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all">
+
+            <label className="flex flex-col items-center justify-center w-full h-22 border-2 border-dashed border-gray-300 rounded-2xl cursor-pointer bg-gray-50 hover:bg-indigo-50 transition-all group">
               <div className="flex flex-col items-center justify-center text-gray-600">
-                <AiOutlineUpload className="w-6 h-6 mb-2 text-blue-500" />
-                <p className="text-sm">Click or drag files to upload</p>
+                <AiOutlineUpload className="w-6 h-6 mb-2 text-indigo-500 group-hover:scale-110 transition" />
+                <p className="text-sm">
+                  <span className="font-semibold">Click to upload</span> or drag
+                  and drop files
+                </p>
               </div>
               <input
                 type="file"
@@ -186,13 +188,13 @@ const CreateProduct = () => {
               />
             </label>
 
-            {/* Media Preview Grid */}
+            {/* Preview Section */}
             {preview.length > 0 && (
-              <div className="mt-4 grid grid-cols-3 sm:grid-cols-4 gap-3">
+              <div className="mt-5 grid grid-cols-3 sm:grid-cols-4 gap-3">
                 {preview.map((item, index) => (
                   <div
                     key={index}
-                    className="relative group rounded-lg overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition"
+                    className="relative group rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition-all"
                   >
                     {item.type === "image" ? (
                       <img
@@ -212,7 +214,7 @@ const CreateProduct = () => {
                     <button
                       type="button"
                       onClick={() => handleDeleteMedia(index)}
-                      className="absolute top-1 right-1 bg-black/70 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition"
+                      className="absolute top-2 right-2 bg-black/70 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition"
                     >
                       <AiOutlineClose className="w-4 h-4" />
                     </button>
@@ -222,28 +224,28 @@ const CreateProduct = () => {
             )}
           </div>
 
-          {/* Availability */}
-          <div className="flex items-center space-x-3">
+          {/* === Availability === */}
+          <div className="flex items-center gap-3 mt-2">
             <input
               type="checkbox"
               name="available"
               checked={form.available}
               onChange={handleChange}
-              className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-400"
+              className="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-2 focus:ring-indigo-500"
             />
             <label className="text-gray-700 font-medium">
               Mark as available for sale
             </label>
           </div>
 
-          {/* Submit */}
+          {/* === Submit Button === */}
           <button
             type="submit"
             disabled={loading}
-            className={`w-full py-3.5 mt-2 font-semibold rounded-lg text-white shadow-md transition-all ${
+            className={`w-full py-3.5 mt-3 font-semibold rounded-xl text-white shadow-md transition-all ${
               loading
-                ? "bg-blue-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700 hover:scale-[1.02]"
+                ? "bg-indigo-400 cursor-not-allowed"
+                : "bg-linear-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 hover:scale-[1.02]"
             }`}
           >
             {loading ? "Creating Product..." : "Create Product"}

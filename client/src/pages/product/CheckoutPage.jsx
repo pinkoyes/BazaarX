@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 const CheckoutPage = () => {
   const { productId } = useParams();
   const navigate = useNavigate();
+
   const [address, setAddress] = useState({
     street: "",
     city: "",
@@ -38,6 +39,7 @@ const CheckoutPage = () => {
     const { street, city, state, pincode } = address;
     if (!street || !city || !state || !pincode)
       return toast.error("Please fill all address fields");
+
     orderMutation.mutate({
       productId,
       deliveryAddress: { street, city, state, pincode },
@@ -49,7 +51,7 @@ const CheckoutPage = () => {
 
   const merchantLogo =
     paymentMethod === "online"
-      ? "https://media.licdn.com/dms/image/v2/C560BAQHggYLcXxs78w/company-logo_200_200/company-logo_200_200/0/1630638664845/razorpay_logo?e=2147483647&v=beta&t=6QV9K9jZitPNz5dcZx-buB-sHzOkyynJY_a6hRN5hQM"
+      ? "https://upload.wikimedia.org/wikipedia/commons/6/6a/Razorpay_logo.svg"
       : "https://cdn-icons-png.flaticon.com/512/3061/3061341.png";
 
   const productImage =
@@ -57,23 +59,24 @@ const CheckoutPage = () => {
     "https://cdn-icons-png.flaticon.com/512/679/679720.png";
 
   return (
-    <div className="min-h-screen bg-slate-50 py-10 px-4 sm:px-6 lg:px-12">
-      <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden">
-        {/* Header */}
-        <div className="px-8 py-6 bg-linear-to-r from-gray-600 to-gray-300 text-white">
-          <h1 className="text-2xl font-semibold">Checkout & Payment</h1>
-          <p className="text-blue-100 text-sm mt-1">
+    <div className="min-h-screen bg-linear-to-br from-indigo-50 via-white to-blue-50 py-14 px-4 sm:px-8 lg:px-16 font-sans text-gray-800">
+      <div className="max-w-6xl mx-auto bg-white/90 backdrop-blur-md border border-gray-200 rounded-3xl shadow-lg overflow-hidden">
+        {/* === Header === */}
+        <div className="px-10 py-8 bg-linear-to-r from-indigo-600 via-blue-600 to-indigo-700 text-white">
+          <h1 className="text-3xl font-bold">Checkout & Payment</h1>
+          <p className="text-indigo-100 text-sm mt-2">
             Securely complete your order below
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 p-8">
-          {/* Left - Address + Payment */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 p-10">
+          {/* === Left: Address + Payment === */}
           <div>
             {/* Delivery Address */}
             <div className="mb-10">
-              <h2 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
-                <span className="text-indigo-600">📍</span> Delivery Address
+              <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <span className="text-indigo-600 text-2xl">📍</span> Delivery
+                Address
               </h2>
 
               <div className="space-y-4">
@@ -84,7 +87,7 @@ const CheckoutPage = () => {
                   onChange={(e) =>
                     setAddress({ ...address, street: e.target.value })
                   }
-                  className="w-full border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                  className="w-full border border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition bg-white/80"
                 />
                 <div className="grid grid-cols-2 gap-4">
                   <input
@@ -94,7 +97,7 @@ const CheckoutPage = () => {
                     onChange={(e) =>
                       setAddress({ ...address, city: e.target.value })
                     }
-                    className="w-full border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                    className="w-full border border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition bg-white/80"
                   />
                   <input
                     type="text"
@@ -103,7 +106,7 @@ const CheckoutPage = () => {
                     onChange={(e) =>
                       setAddress({ ...address, state: e.target.value })
                     }
-                    className="w-full border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                    className="w-full border border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition bg-white/80"
                   />
                 </div>
                 <input
@@ -113,57 +116,74 @@ const CheckoutPage = () => {
                   onChange={(e) =>
                     setAddress({ ...address, pincode: e.target.value })
                   }
-                  className="w-full border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                  className="w-full border border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition bg-white/80"
                 />
               </div>
             </div>
 
             {/* Payment Method */}
             <div className="mb-8">
-              <h2 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
-                <span className="text-indigo-600">💳</span> Payment Method
+              <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <span className="text-indigo-600 text-2xl">💳</span> Payment
+                Method
               </h2>
 
-              <div className="space-y-3">
-                <label className="flex items-center gap-3 cursor-pointer border border-slate-300 p-3 rounded-lg hover:border-indigo-500 transition">
-                  <input
-                    type="radio"
-                    name="payment"
-                    value="cod"
-                    checked={paymentMethod === "cod"}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                    className="accent-indigo-600"
+              <div className="space-y-4">
+                <label className="flex items-center justify-between border border-gray-300 p-4 rounded-xl cursor-pointer hover:border-indigo-500 transition bg-white/80">
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="radio"
+                      name="payment"
+                      value="cod"
+                      checked={paymentMethod === "cod"}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                      className="accent-indigo-600"
+                    />
+                    <span className="text-gray-700 font-medium">
+                      Cash on Delivery
+                    </span>
+                  </div>
+                  <img
+                    src="https://cdn-icons-png.flaticon.com/512/1252/1252354.png"
+                    alt="COD"
+                    className="h-6 opacity-80"
                   />
-                  <span className="text-slate-700 font-medium">
-                    Cash on Delivery (COD)
-                  </span>
                 </label>
 
-                <label className="flex items-center gap-3 cursor-pointer border border-slate-300 p-3 rounded-lg hover:border-indigo-500 transition">
-                  <input
-                    type="radio"
-                    name="payment"
-                    value="online"
-                    checked={paymentMethod === "online"}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                    className="accent-indigo-600"
+                <label className="flex items-center justify-between border border-gray-300 p-4 rounded-xl cursor-pointer hover:border-indigo-500 transition bg-white/80">
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="radio"
+                      name="payment"
+                      value="online"
+                      checked={paymentMethod === "online"}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                      className="accent-indigo-600"
+                    />
+                    <span className="text-gray-700 font-medium">
+                      Pay Online (Recommended)
+                    </span>
+                  </div>
+                  <img
+                    src="https://upload.wikimedia.org/wikipedia/commons/6/6a/Razorpay_logo.svg"
+                    alt="Razorpay"
+                    className="h-6"
                   />
-                  <span className="text-slate-700 font-medium">
-                    Pay Online (Recommended)
-                  </span>
                 </label>
 
                 {paymentMethod === "online" && (
-                  <div className="mt-4 bg-slate-50 border border-slate-200 p-4 rounded-lg flex items-center justify-between">
+                  <div className="mt-4 bg-indigo-50 border border-indigo-200 p-4 rounded-xl flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-slate-600">
+                      <p className="text-sm text-gray-600">
                         Securely processed via
                       </p>
-                      <p className="font-semibold text-indigo-600">Razorpay</p>
+                      <p className="font-semibold text-indigo-700">
+                        Razorpay Gateway
+                      </p>
                     </div>
                     <img
                       src={merchantLogo}
-                      alt="Merchant"
+                      alt="Payment Gateway"
                       className="h-8 object-contain"
                     />
                   </div>
@@ -175,7 +195,7 @@ const CheckoutPage = () => {
             <button
               onClick={handlePlaceOrder}
               disabled={orderMutation.isPending}
-              className="w-full bg-linear-to-r bg-gray-600 text-white py-3 rounded-lg font-medium hover:bg-gray-700 transition-all duration-200 shadow-md disabled:opacity-70 cursor-pointer"
+              className="w-full bg-linear-to-r from-indigo-600 to-blue-600 text-white py-3 rounded-xl font-semibold text-lg hover:from-indigo-700 hover:to-blue-700 transition-all shadow-md hover:shadow-lg disabled:opacity-60"
             >
               {orderMutation.isPending
                 ? "Processing Order..."
@@ -183,51 +203,53 @@ const CheckoutPage = () => {
             </button>
           </div>
 
-          {/* Right - Summary */}
-          <div className="bg-slate-50 p-6 rounded-xl border border-slate-200">
-            <h2 className="text-lg font-semibold text-slate-800 mb-5">
+          {/* === Right: Summary === */}
+          <div className="bg-white/90 border border-gray-200 p-6 rounded-2xl shadow-inner">
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">
               Order Summary
             </h2>
 
-            <div className="flex items-center gap-4 border-b pb-5 mb-5">
+            <div className="flex items-center gap-4 border-b border-gray-200 pb-5 mb-5">
               <img
                 src={productImage}
                 alt={product.title}
-                className="w-28 h-28 object-cover rounded-lg border border-slate-200 bg-white"
+                className="w-28 h-28 object-cover rounded-xl border border-gray-200 bg-white"
               />
               <div>
-                <h3 className="text-slate-800 font-medium">{product.title}</h3>
-                <p className="text-slate-500 text-sm mt-1">
+                <h3 className="text-gray-900 font-medium text-lg">
+                  {product.title}
+                </h3>
+                <p className="text-gray-500 text-sm mt-1">
                   Category: {product.category}
                 </p>
-                <p className="text-indigo-600 font-semibold text-lg mt-2">
+                <p className="text-indigo-600 font-semibold text-xl mt-2">
                   ₹{product.price?.toLocaleString()}
                 </p>
               </div>
             </div>
 
-            <div className="space-y-2 text-slate-700">
+            <div className="space-y-3 text-gray-700">
               <div className="flex justify-between">
                 <span>Product Price</span>
                 <span>₹{product.price?.toLocaleString()}</span>
               </div>
               <div className="flex justify-between">
                 <span>Delivery</span>
-                <span className="text-green-600">Free</span>
+                <span className="text-green-600 font-medium">Free</span>
               </div>
-              <div className="border-t mt-3 pt-3 flex justify-between font-semibold text-slate-800 text-lg">
+              <div className="border-t border-gray-200 mt-3 pt-3 flex justify-between font-semibold text-gray-900 text-lg">
                 <span>Total</span>
                 <span>₹{product.price?.toLocaleString()}</span>
               </div>
             </div>
 
-            <p className="text-xs text-slate-500 mt-4">
+            <p className="text-xs text-gray-500 mt-5">
               By placing your order, you agree to our{" "}
-              <span className="text-indigo-600 cursor-pointer hover:underline">
+              <span className="text-indigo-600 hover:underline cursor-pointer">
                 Terms & Conditions
               </span>{" "}
               and{" "}
-              <span className="text-indigo-600 cursor-pointer hover:underline">
+              <span className="text-indigo-600 hover:underline cursor-pointer">
                 Privacy Policy
               </span>
               .

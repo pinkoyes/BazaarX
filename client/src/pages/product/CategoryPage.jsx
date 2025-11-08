@@ -5,17 +5,16 @@ import { fetchProductByCategory } from "../../api/product";
 import ProductCard from "../../components/ProductCard";
 import toast from "react-hot-toast";
 
-// ===== Spinner Components =====
+// ===== Spinner Overlay =====
 const SpinnerOverlay = () => (
-  <div className="fixed inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm z-50">
-    <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+  <div className="fixed inset-0 flex items-center justify-center bg-white/70 backdrop-blur-sm z-50">
+    <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
   </div>
 );
 
 const CategoryPage = () => {
   const { categoryName } = useParams();
 
-  // Fetch products by category using TanStack Query
   const {
     data: products = [],
     isLoading,
@@ -29,21 +28,22 @@ const CategoryPage = () => {
   if (isError) toast.error("Failed to load products for this category.");
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-gray-50 via-white to-gray-100 font-sans text-gray-800">
+    <div className="min-h-screen bg-linear-to-br from-gray-50 via-white to-indigo-50 font-sans text-gray-800">
       {isLoading && <SpinnerOverlay />}
 
       {/* ===== Hero Section ===== */}
-      <section className="relative py-20 px-6 text-center overflow-hidden bg-linear-to-r from-blue-700 via-indigo-600 to-purple-600 text-white shadow-md">
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/diagonal-noise.png')] opacity-20"></div>
+      <section className="relative py-24 px-6 text-center overflow-hidden bg-linear-to-r from-indigo-600 via-blue-600 to-indigo-700 text-white shadow-lg rounded-b-3xl">
+        {/* Subtle background pattern */}
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
 
         <div className="relative z-10 max-w-3xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-extrabold mb-3 capitalize drop-shadow-sm">
+          <h1 className="text-5xl font-extrabold mb-4 capitalize drop-shadow-sm tracking-tight">
             {categoryName}
           </h1>
-          <p className="text-lg text-blue-100 max-w-xl mx-auto">
-            Discover exclusive deals and handpicked items from our{" "}
-            <span className="capitalize font-semibold">{categoryName}</span>{" "}
-            collection.
+          <p className="text-lg text-indigo-100 max-w-xl mx-auto leading-relaxed">
+            Explore the best{" "}
+            <span className="font-semibold capitalize">{categoryName}</span>{" "}
+            products — curated for quality and value.
           </p>
         </div>
       </section>
@@ -66,14 +66,14 @@ const CategoryPage = () => {
             </p>
             <Link
               to="/create-product"
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition transform hover:scale-105 shadow-md"
+              className="bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-transform duration-200 hover:scale-105 shadow-md"
             >
               List a Product
             </Link>
           </div>
         ) : (
           <>
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-12">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-12 border-b border-gray-200 pb-4">
               <h2 className="text-3xl font-bold text-gray-900 tracking-tight capitalize">
                 {categoryName} Products
               </h2>
@@ -83,9 +83,15 @@ const CategoryPage = () => {
               </p>
             </div>
 
+            {/* Product Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
               {products.map((product) => (
-                <ProductCard key={product._id} product={product} />
+                <div
+                  key={product._id}
+                  className="transform transition-all duration-300 hover:-translate-y-2"
+                >
+                  <ProductCard product={product} />
+                </div>
               ))}
             </div>
           </>
@@ -95,7 +101,7 @@ const CategoryPage = () => {
       {/* ===== Floating Back Button ===== */}
       <Link
         to="/"
-        className="fixed bottom-8 left-8 bg-gray-800 hover:bg-gray-900 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-transform duration-300 hover:scale-110 cursor-pointer text-xl"
+        className="fixed bottom-8 left-8 bg-white border border-gray-300 hover:border-gray-400 text-gray-700 hover:text-gray-900 p-4 rounded-full shadow-lg hover:shadow-xl transition-transform duration-300 hover:scale-110 cursor-pointer text-xl"
         title="Back to Home"
       >
         ⬅

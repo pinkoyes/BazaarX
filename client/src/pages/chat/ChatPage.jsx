@@ -6,14 +6,14 @@ import { io } from "socket.io-client";
 import { FiSend, FiArrowLeft, FiUser } from "react-icons/fi";
 import Spinner from "../../components/ui/Spinner";
 import toast from "react-hot-toast";
-import { useAuth } from "../../context/AuthContext"; // ✅ assume you have user context
+import { useAuth } from "../../context/AuthContext";
 
 const SOCKET_URL = import.meta.env.VITE_API_BASE_URL;
 
 const ChatPage = () => {
   const { chatRoomId } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth(); // ✅ current logged-in user
+  const { user } = useAuth();
   const [socket, setSocket] = useState(null);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
@@ -62,7 +62,6 @@ const ChatPage = () => {
     if (!message.trim()) return;
     const newMsg = { chatRoomId, content: message.trim() };
 
-    // Optimistic UI
     const tempMsg = {
       _id: Date.now(),
       sender: { _id: user._id, fullName: user.fullName },
@@ -73,10 +72,7 @@ const ChatPage = () => {
     setMessage("");
 
     sendMessageMutation.mutate(newMsg);
-    socket.emit("sendMessage", {
-      chatRoomId,
-      content: message,
-    });
+    socket.emit("sendMessage", newMsg);
   };
 
   if (isLoading) return <Spinner />;
@@ -88,58 +84,60 @@ const ChatPage = () => {
     );
 
   return (
-    <div className="flex justify-center min-h-screen bg-linear-to-b from-gray-50 via-gray-100 to-gray-200">
-      <div className="flex flex-col w-full max-w-7xl bg-white shadow-lg rounded-xl overflow-hidden my-6 mx-2 sm:mx-6 lg:mx-8 border border-gray-100">
+    <div className="h-[90vh] bg-linear-to-br from-gray-100 via-white to-indigo-50 flex justify-center py-6 sm:py-10">
+      <div className="w-full max-w-5xl flex flex-col rounded-3xl shadow-2xl bg-white/90 backdrop-blur-md border border-gray-100 overflow-hidden">
         {/* ===== Header ===== */}
-        <div className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50 px-5 py-4 flex items-center gap-3">
+        <div className="bg-linear-to-r from-indigo-600 to-blue-600 text-white flex items-center gap-4 px-6 py-4 shadow-md sticky top-0 z-50">
           <button
             onClick={() => navigate(-1)}
-            className="p-2 rounded-full hover:bg-gray-100 transition"
+            className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition"
           >
             <FiArrowLeft size={20} />
           </button>
-
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-              <FiUser className="text-blue-600 text-xl" />
+            <div className="w-11 h-11 rounded-full bg-white/20 flex items-center justify-center">
+              <FiUser className="text-white text-xl" />
             </div>
             <div>
-              <p className="font-semibold text-gray-800 text-sm">
-                Chat Conversation
-              </p>
-              <p className="text-xs text-green-500">Online</p>
+              <h2 className="font-semibold text-lg leading-tight">
+                Chat with Seller
+              </h2>
+              <p className="text-xs text-blue-100">Online</p>
             </div>
           </div>
         </div>
 
-        {/* ===== Messages ===== */}
-        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4 bg-linear-to-b from-gray-50 to-gray-100 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+        {/* ===== Messages Section ===== */}
+        <div
+          className="flex-1 overflow-y-auto px-6 py-8 space-y-5 bg-linear-to-b from-white to-gray-100 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent"
+          style={{ maxHeight: "calc(100vh - 180px)" }}
+        >
           {messages.length === 0 && (
-            <div className="flex items-center justify-center h-full text-gray-400 text-sm italic">
+            <div className="flex items-center justify-center h-full text-gray-400 italic text-sm">
               No messages yet. Start the conversation!
             </div>
           )}
 
           {messages.map((msg) => {
-            const isMine = msg.sender?._id === user?._id; // ✅ check user
+            const isMine = msg.sender?._id === user?._id;
             return (
               <div
                 key={msg._id}
                 className={`flex ${isMine ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`max-w-[70%] px-4 py-3 rounded-2xl text-sm shadow-sm transition-all duration-200 ${
+                  className={`max-w-[75%] px-5 py-3.5 rounded-2xl shadow-sm transition-all duration-300 wrap-break-word ${
                     isMine
-                      ? "bg-blue-600 text-white rounded-br-none"
-                      : "bg-gray-100 text-gray-800 border border-gray-200 rounded-bl-none"
+                      ? "bg-linear-to-r from-indigo-600 to-blue-600 text-white rounded-br-none"
+                      : "bg-white border border-gray-200 text-gray-900 rounded-bl-none"
                   }`}
                 >
-                  <p className="leading-snug whitespace-pre-line">
+                  <p className="text-[15px] leading-relaxed whitespace-pre-line">
                     {msg.content}
                   </p>
                   <div
-                    className={`text-[10px] mt-1 text-right ${
-                      isMine ? "text-blue-100" : "text-gray-400"
+                    className={`text-[11px] mt-1 text-right ${
+                      isMine ? "text-blue-100" : "text-gray-500"
                     }`}
                   >
                     {new Date(msg.createdAt).toLocaleTimeString([], {
@@ -151,26 +149,25 @@ const ChatPage = () => {
               </div>
             );
           })}
-
           <div ref={scrollRef}></div>
         </div>
 
         {/* ===== Input Section ===== */}
-        <div className="bg-gray-50 border-t border-gray-200 p-4 flex items-center gap-3 sticky bottom-0">
+        <div className="bg-white/85 backdrop-blur-md border-t border-gray-200 px-5 py-4 flex items-center gap-3 sticky bottom-0 z-50">
           <input
             type="text"
             placeholder="Type a message..."
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
-            className="flex-1 px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm placeholder-gray-400"
+            className="flex-1 px-5 py-3 text-base rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50 placeholder-gray-500 text-gray-900"
           />
           <button
             onClick={handleSend}
             disabled={sendMessageMutation.isPending}
-            className="p-3 bg-blue-600 rounded-full text-white hover:bg-blue-700 active:scale-95 disabled:opacity-60 transition"
+            className="p-3 bg-linear-to-r from-indigo-600 to-blue-600 rounded-full text-white shadow-md hover:shadow-lg hover:scale-105 active:scale-95 disabled:opacity-60 transition-all"
           >
-            <FiSend size={18} />
+            <FiSend size={20} />
           </button>
         </div>
       </div>
