@@ -43,3 +43,8 @@ export const fetchAllCategories = async () => {
 export const initiateChatWithOwner = async () => {
   console.log("chat with owner!...");
 };
+
+export const searchProducts = async (query) => {
+  const res = await api.get(`/product/search/?q=${encodeURIComponent(query)}`);
+  return res.data?.data;
+};

@@ -1,10 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { fetchProductsForHomePage, fetchAllCategories } from "../api/product";
+import {
+  fetchProductsForHomePage,
+  fetchAllCategories,
+  searchProducts,
+} from "../api/product";
 import ProductCard from "../components/ProductCard";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
+import { useDebounce } from "../hooks/useDebounce";
+import { FiSearch } from "react-icons/fi";
 
 const SpinnerOverlay = () => (
   <div className="fixed inset-0 flex items-center justify-center bg-white/70 backdrop-blur-sm z-50">
@@ -21,7 +27,11 @@ const Spinner = () => (
 const Home = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
+  const [showDropdown, setShowDropdown] = useState(false);
 
+  const debouncedSearch = useDebounce(search, 600);
+
+  // Fetch all categories
   const {
     data: categories = [],
     isLoading: categoryLoading,
@@ -32,6 +42,7 @@ const Home = () => {
     staleTime: 1000 * 60 * 10,
   });
 
+  // Fetch featured/home products
   const {
     data: products = [],
     isLoading: productLoading,
@@ -42,6 +53,18 @@ const Home = () => {
     staleTime: 1000 * 60 * 5,
   });
 
+  // Search live suggestions
+  const { data: searchResults = [], isLoading: searchLoading } = useQuery({
+    queryKey: ["searchProducts", debouncedSearch],
+    queryFn: () => searchProducts(debouncedSearch),
+    enabled: debouncedSearch.trim().length > 1,
+  });
+
+  useEffect(() => {
+    if (debouncedSearch.trim().length > 1) setShowDropdown(true);
+    else setShowDropdown(false);
+  }, [debouncedSearch]);
+
   if (categoryError) toast.error("Failed to load categories");
   if (productError) toast.error("Failed to load featured products");
 
@@ -49,8 +72,15 @@ const Home = () => {
     navigate(`/category/${encodeURIComponent(cat)}`);
   };
 
+  const handleSearchSubmit = () => {
+    if (search.trim() !== "") {
+      navigate(`/search?q=${encodeURIComponent(search.trim())}`);
+      setShowDropdown(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-linear-to-b from-gray-50 via-gray-100 to-white text-gray-800">
+    <div className="min-h-screen bg-linear-to-b from-gray-50 via-gray-100 to-white text-gray-800 relative">
       {(categoryLoading || productLoading) && <SpinnerOverlay />}
 
       {/* ===== Hero Section ===== */}
@@ -83,41 +113,65 @@ const Home = () => {
             Your one-stop marketplace — fast, secure, and beautifully simple.
           </motion.p>
 
+          {/* ===== Search Input ===== */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="flex flex-col sm:flex-row justify-center gap-3 w-full sm:w-auto"
+            className="relative w-full sm:w-96 mx-auto"
           >
-            <div className="relative w-full sm:w-96">
+            <div className="relative">
               <input
                 type="text"
                 placeholder="Search products or categories..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSearchSubmit()}
                 className="w-full pl-5 pr-12 py-3 rounded-xl border border-white/40 bg-white/10 text-white placeholder-white/70 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-white/70 transition-all"
               />
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-5 h-5 text-gray-200 absolute right-4 top-1/2 -translate-y-1/2"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1110 3a7.5 7.5 0 016.65 13.65z"
-                />
-              </svg>
+              <FiSearch
+                className="w-5 h-5 text-gray-200 absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer"
+                onClick={handleSearchSubmit}
+              />
             </div>
-            <button
-              onClick={() => toast("Search feature coming soon!")}
-              className="bg-white text-indigo-700 font-semibold px-8 py-3 rounded-xl hover:bg-indigo-100 transition shadow-md"
-            >
-              Search
-            </button>
+
+            {/* ===== Live Search Dropdown ===== */}
+            {showDropdown && (
+              <div className="absolute left-0 mt-2 w-full bg-white rounded-lg shadow-lg overflow-hidden z-50 max-h-60 overflow-y-auto">
+                {searchLoading ? (
+                  <p className="p-3 text-gray-500 text-center">Searching...</p>
+                ) : searchResults.length === 0 ? (
+                  <p className="p-3 text-gray-500 text-center">
+                    No products found
+                  </p>
+                ) : (
+                  searchResults.map((item) => (
+                    <div
+                      key={item._id}
+                      onClick={() => navigate(`/product/${item._id}`)}
+                      className="p-3 flex items-center gap-3 hover:bg-gray-100 cursor-pointer transition"
+                    >
+                      <img
+                        src={
+                          item.media?.[0]?.url ||
+                          "https://via.placeholder.com/60"
+                        }
+                        alt={item.title}
+                        className="w-10 h-10 rounded object-cover"
+                      />
+                      <div>
+                        <p className="font-medium text-gray-800">
+                          {item.title}
+                        </p>
+                        <p className="text-sm text-gray-500 truncate">
+                          {item.category}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
           </motion.div>
         </div>
       </section>

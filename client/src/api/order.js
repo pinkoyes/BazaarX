@@ -7,7 +7,6 @@ export const placeOrder = async (data) => {
 
 export const myOrders = async () => {
   const res = await api.get("/order/my");
-  console.log(res);
   return res.data.data;
 };
 

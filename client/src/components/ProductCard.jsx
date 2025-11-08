@@ -17,7 +17,6 @@ const ProductCard = ({ product }) => {
     mutationFn: () => addToCart(product._id),
     onSuccess: (data) => {
       toast.success(data.message || "Added to cart successfully");
-      console.log(data);
     },
     onError: (err) => {
       toast.error(err.response?.data?.message || "Failed to add to cart");
@@ -41,13 +40,19 @@ const ProductCard = ({ product }) => {
         {/* Overlay Gradient */}
         <div className="absolute inset-0 bg-linear-to-t from-black/50 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
 
-        {/* 🛒 Add to Cart Button (always visible) */}
+        {/* 🛒 Add to Cart Button (responsive visibility) */}
         <button
           onClick={(e) => {
             e.preventDefault(); // prevent navigation
             if (!isPending) handleAddToCart();
           }}
-          className="absolute top-3 right-3 bg-white/90 backdrop-blur-md p-2.5 rounded-full transition-all duration-300 hover:bg-white hover:scale-110 shadow-md cursor-pointer"
+          className={`
+            absolute top-3 right-3 
+            bg-white/90 backdrop-blur-md p-2.5 rounded-full shadow-md 
+            transition-all duration-300 hover:bg-white hover:scale-110 cursor-pointer
+            ${isPending ? "opacity-70" : ""}
+            opacity-100 sm:opacity-100 md:opacity-0 md:group-hover:opacity-100
+          `}
           title="Add to Cart"
         >
           {isPending ? (
