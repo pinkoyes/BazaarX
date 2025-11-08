@@ -1,12 +1,28 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { FiMapPin, FiHeart } from "react-icons/fi";
+import { FiMapPin, FiShoppingCart } from "react-icons/fi";
+import { FaShoppingCart } from "react-icons/fa";
+import { useMutation } from "@tanstack/react-query";
+import toast from "react-hot-toast";
+import { addToCart } from "../api/cart";
 
 const ProductCard = ({ product }) => {
   const image =
     product.media?.length > 0
       ? product.media[0].url
       : "https://via.placeholder.com/400x300?text=No+Image";
+
+  // Mutation for Add to Cart
+  const { mutate: handleAddToCart, isPending } = useMutation({
+    mutationFn: () => addToCart(product._id),
+    onSuccess: (data) => {
+      toast.success(data.message || "Added to cart successfully");
+      console.log(data);
+    },
+    onError: (err) => {
+      toast.error(err.response?.data?.message || "Failed to add to cart");
+    },
+  });
 
   return (
     <Link
@@ -25,12 +41,20 @@ const ProductCard = ({ product }) => {
         {/* Overlay Gradient */}
         <div className="absolute inset-0 bg-linear-to-t from-black/50 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
 
-        {/* Wishlist Icon */}
+        {/* 🛒 Add to Cart Button (always visible) */}
         <button
-          onClick={(e) => e.preventDefault()}
-          className="absolute top-3 right-3 bg-white/80 backdrop-blur-md p-2.5 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white hover:scale-110 shadow-md"
+          onClick={(e) => {
+            e.preventDefault(); // prevent navigation
+            if (!isPending) handleAddToCart();
+          }}
+          className="absolute top-3 right-3 bg-white/90 backdrop-blur-md p-2.5 rounded-full transition-all duration-300 hover:bg-white hover:scale-110 shadow-md cursor-pointer"
+          title="Add to Cart"
         >
-          <FiHeart className="text-gray-700 hover:text-red-500" size={18} />
+          {isPending ? (
+            <FaShoppingCart className="text-gray-400 animate-pulse" size={18} />
+          ) : (
+            <FiShoppingCart className="text-gray-700" size={18} />
+          )}
         </button>
 
         {/* Sold Badge */}

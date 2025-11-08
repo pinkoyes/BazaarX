@@ -18,6 +18,7 @@ import SellerRequests from "./pages/dashboard/SellerRequests";
 import ChatPage from "./pages/chat/ChatPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
+import CartPage from "./pages/cart/CartPage";
 
 const router = createBrowserRouter([
   {
@@ -118,6 +119,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <ChatPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "cart",
+        element: (
+          <ProtectedRoute>
+            <CartPage />
           </ProtectedRoute>
         ),
       },

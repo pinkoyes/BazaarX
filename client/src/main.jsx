@@ -18,7 +18,7 @@ createRoot(document.getElementById("root")).render(
       <Provider store={store}>
         <AuthProvider>
           <RouterProvider router={router} />
-          <Toaster position="bottom-right" reverseOrder={false} />
+          <Toaster position="top-right" reverseOrder={false} />
           <ReactQueryDevtools initialIsOpen={false} />
         </AuthProvider>
       </Provider>

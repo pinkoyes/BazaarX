@@ -11,6 +11,8 @@ import {
   FiBox,
   FiMessageCircle,
   FiCheckCircle,
+  FiXCircle,
+  FiAlertTriangle,
 } from "react-icons/fi";
 import toast from "react-hot-toast";
 
@@ -62,16 +64,38 @@ const MyOrder = () => {
 
   const formatAddress = (address) => {
     if (!address) return "Not provided";
-    if (typeof address === "string") return address;
-    if (typeof address === "object") {
-      const { street, city, state, pincode } = address;
-      return [street, city, state, pincode].filter(Boolean).join(", ");
-    }
-    return "Invalid address format";
+    const { street, city, state, pincode } = address;
+    return [street, city, state, pincode].filter(Boolean).join(", ");
   };
 
   const handleChatWithSeller = (productId) => {
     chatMutation.mutate({ productId });
+  };
+
+  const getStatusStyle = (status) => {
+    switch (status) {
+      case "accepted":
+        return "bg-green-500 text-white";
+      case "pending":
+        return "bg-yellow-400 text-gray-800";
+      case "rejected":
+        return "bg-red-500 text-white";
+      default:
+        return "bg-gray-400 text-white";
+    }
+  };
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case "accepted":
+        return <FiCheckCircle className="text-green-500" />;
+      case "pending":
+        return <FiAlertTriangle className="text-yellow-400" />;
+      case "rejected":
+        return <FiXCircle className="text-red-500" />;
+      default:
+        return <FiClock className="text-gray-400" />;
+    }
   };
 
   // === Loading / Error ===
@@ -104,123 +128,120 @@ const MyOrder = () => {
         </h1>
 
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {orders.map((order) => (
-            <div
-              key={order._id}
-              className="group bg-white/90 backdrop-blur-md border border-gray-200 rounded-3xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col"
-            >
-              {/* === Product Image === */}
-              <div className="relative h-56 overflow-hidden">
-                <img
-                  src={
-                    order.productId?.media?.[0]?.url ||
-                    "https://via.placeholder.com/400x300?text=No+Image"
-                  }
-                  alt={order.productId?.title}
-                  className="w-full h-full object-cover transform group-hover:scale-110 transition-all duration-700"
-                />
-                <div
-                  className={`absolute top-4 right-4 px-3 py-1.5 rounded-full text-xs font-semibold capitalize shadow-md ${
-                    order.status === "delivered"
-                      ? "bg-green-500 text-white"
-                      : order.status === "pending"
-                      ? "bg-yellow-400 text-gray-800"
-                      : order.status === "cancelled"
-                      ? "bg-red-500 text-white"
-                      : "bg-gray-400 text-white"
-                  }`}
-                >
-                  {order.status}
-                </div>
-              </div>
+          {orders.map((order) => {
+            const isRejected = order.status === "rejected";
+            const isDisabled = chatMutation.isPending || isRejected;
 
-              {/* === Content === */}
-              <div className="p-6 flex flex-col flex-1 justify-between">
-                {/* === Product Details === */}
-                <div>
-                  <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2 mb-2">
-                    <FiPackage className="text-indigo-500" />
-                    {order.productId?.title || "Untitled Product"}
-                  </h2>
-
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                    {order.productId?.description ||
-                      "No description available."}
-                  </p>
-
-                  <p className="text-indigo-600 font-bold text-xl">
-                    ₹{order.priceAtPurchase?.toLocaleString("en-IN")}
-                  </p>
-                </div>
-
-                {/* === Info Section === */}
-                <div className="mt-5 space-y-3 text-sm text-gray-700">
-                  <div className="flex items-start gap-2">
-                    <FiUser className="text-indigo-500 mt-0.5" />
-                    <span>
-                      <strong>Seller:</strong>{" "}
-                      {order.sellerId?.fullName || "Unknown"}
-                    </span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <FiMapPin className="text-indigo-500 mt-0.5" />
-                    <span>
-                      <strong>Address:</strong>{" "}
-                      {formatAddress(order.deliveryAddress)}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <FiCreditCard className="text-indigo-500" />
-                    <span>
-                      <strong>Payment:</strong>{" "}
-                      {order.paymentInfo?.provider || "Not specified"}
-                    </span>
-                  </div>
-                </div>
-
-                {/* === Divider === */}
-                <div className="my-5 border-t border-gray-100"></div>
-
-                {/* === Footer === */}
-                <div className="flex justify-between items-center mt-auto">
-                  <div className="flex items-center gap-2 text-gray-500 text-xs">
-                    <FiClock className="text-indigo-500" />
-                    <span>{formatDate(order.createdAt)}</span>
-                  </div>
-
-                  <button
-                    onClick={() => handleChatWithSeller(order.productId?._id)}
-                    disabled={chatMutation.isPending}
-                    className="flex items-center gap-2 bg-linear-to-r from-indigo-600 to-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium shadow-md hover:shadow-xl hover:scale-105 transition-all disabled:opacity-70"
-                  >
-                    <FiMessageCircle />
-                    {chatMutation.isPending
-                      ? "Starting..."
-                      : "Chat with Seller"}
-                  </button>
-                </div>
-              </div>
-
-              {/* === Delivery Indicator === */}
-              <div className="bg-gray-50 border-t border-gray-100 px-6 py-3 flex items-center justify-between text-sm text-gray-600">
-                <div className="flex items-center gap-2">
-                  <FiCheckCircle
-                    className={`${
-                      order.status === "delivered"
-                        ? "text-green-500"
-                        : order.status === "pending"
-                        ? "text-yellow-400"
-                        : "text-gray-400"
-                    }`}
+            return (
+              <div
+                key={order._id}
+                className="group bg-white/90 backdrop-blur-md border border-gray-200 rounded-3xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col"
+              >
+                {/* === Product Image === */}
+                <div className="relative h-56 overflow-hidden">
+                  <img
+                    src={
+                      order.productId?.media?.[0]?.url ||
+                      "https://via.placeholder.com/400x300?text=No+Image"
+                    }
+                    alt={order.productId?.title}
+                    className="w-full h-full object-cover transform group-hover:scale-110 transition-all duration-700"
                   />
-                  <span className="capitalize">{order.status}</span>
+                  <div
+                    className={`absolute top-4 right-4 px-3 py-1.5 rounded-full text-xs font-semibold capitalize shadow-md ${getStatusStyle(
+                      order.status
+                    )}`}
+                  >
+                    {order.status}
+                  </div>
                 </div>
-                <span className="text-xs italic">
-                  Order ID: {order._id.slice(-6).toUpperCase()}
-                </span>
+
+                {/* === Content === */}
+                <div className="p-6 flex flex-col flex-1 justify-between">
+                  <div>
+                    <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2 mb-2">
+                      <FiPackage className="text-indigo-500" />
+                      {order.productId?.title || "Untitled Product"}
+                    </h2>
+
+                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                      {order.productId?.description ||
+                        "No description available."}
+                    </p>
+
+                    <p className="text-indigo-600 font-bold text-xl">
+                      ₹{order.priceAtPurchase?.toLocaleString("en-IN")}
+                    </p>
+                  </div>
+
+                  <div className="mt-5 space-y-3 text-sm text-gray-700">
+                    <div className="flex items-start gap-2">
+                      <FiUser className="text-indigo-500 mt-0.5" />
+                      <span>
+                        <strong>Seller:</strong>{" "}
+                        {order.sellerId?.fullName || "Unknown"}
+                      </span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <FiMapPin className="text-indigo-500 mt-0.5" />
+                      <span>
+                        <strong>Address:</strong>{" "}
+                        {formatAddress(order.deliveryAddress)}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <FiCreditCard className="text-indigo-500" />
+                      <span>
+                        <strong>Payment:</strong>{" "}
+                        {order.paymentInfo?.provider?.toUpperCase()}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="my-5 border-t border-gray-100"></div>
+
+                  <div className="flex justify-between items-center mt-auto">
+                    <div className="flex items-center gap-2 text-gray-500 text-xs">
+                      <FiClock className="text-indigo-500" />
+                      <span>{formatDate(order.createdAt)}</span>
+                    </div>
+
+                    {/* === Chat Button === */}
+                    <button
+                      onClick={() =>
+                        !isRejected &&
+                        handleChatWithSeller(order.productId?._id)
+                      }
+                      disabled={isDisabled}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium shadow-md transition-all duration-200 ${
+                        isRejected
+                          ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                          : "bg-linear-to-r from-indigo-600 to-blue-600 text-white hover:shadow-xl hover:scale-105 disabled:opacity-70 cursor-pointer"
+                      }`}
+                    >
+                      <FiMessageCircle />
+                      {isRejected
+                        ? "Order Rejected"
+                        : chatMutation.isPending
+                        ? "Starting..."
+                        : "Chat with Seller"}
+                    </button>
+                  </div>
+                </div>
+
+                {/* === Status Footer === */}
+                <div className="bg-gray-50 border-t border-gray-100 px-6 py-3 flex items-center justify-between text-sm text-gray-600">
+                  <div className="flex items-center gap-2">
+                    {getStatusIcon(order.status)}
+                    <span className="capitalize">{order.status}</span>
+                  </div>
+                  <span className="text-xs italic">
+                    Order ID: {order._id.slice(-6).toUpperCase()}
+                  </span>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
