@@ -15,7 +15,7 @@ createRoot(document.getElementById("root")).render(
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <RouterProvider router={router} />
-        <Toaster position="top-right" reverseOrder={false} />
+        <Toaster position="bottom-left" reverseOrder={false} />
         <ReactQueryDevtools initialIsOpen={false} />
       </AuthProvider>
     </QueryClientProvider>
