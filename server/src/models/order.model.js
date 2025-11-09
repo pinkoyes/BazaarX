@@ -23,21 +23,30 @@ const orderSchema = new mongoose.Schema(
     },
     paymentStatus: {
       type: String,
-      enum: ["unpaid", "paid"],
+      enum: ["unpaid", "awaiting_payment", "paid", "failed"],
       default: "unpaid",
       required: true,
     },
     paymentInfo: {
       provider: {
         type: String,
-        enum: ["razorpay", "stripe", "cod"],
+        enum: ["online", "cod"],
         default: "cod",
       },
-      paymentId: String,
+      orderId: { type: String },
+      paymentId: { type: String },
+      signature: { type: String },
     },
     status: {
       type: String,
-      enum: ["pending", "accepted", "rejected"],
+      enum: [
+        "pending",
+        "accepted",
+        "rejected",
+        "purchased",
+        "delivered",
+        "cancelled",
+      ],
       default: "pending",
     },
     deliveryAddress: {
@@ -45,6 +54,17 @@ const orderSchema = new mongoose.Schema(
       city: { type: String, required: true },
       state: { type: String, required: true },
       pincode: { type: String, required: true },
+    },
+    transactionRef: {
+      type: String,
+      default: null,
+    },
+    timeline: {
+      placedAt: { type: Date, default: Date.now },
+      acceptedAt: { type: Date },
+      paidAt: { type: Date },
+      deliveredAt: { type: Date },
+      cancelledAt: { type: Date },
     },
   },
   { timestamps: true }
