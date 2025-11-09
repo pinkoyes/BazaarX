@@ -9,50 +9,57 @@ export const createOrGetChatRoom = asyncHandler(async (req, res) => {
   const { productId, buyerId: buyerFromBody } = req.body;
   const userId = req.user?._id;
 
-  if (!productId) {
-    throw new ApiError(400, "Product ID is required");
-  }
+  if (!productId) throw new ApiError(400, "Product ID is required");
 
   const product = await Product.findById(productId);
-  if (!product) {
-    throw new ApiError(404, "Product not found");
-  }
+  if (!product) throw new ApiError(404, "Product not found");
 
   const sellerId = product.ownerId;
-
   let buyerId;
 
   if (userId.toString() === sellerId.toString()) {
-    if (!buyerFromBody) {
-      throw new ApiError(
-        400,
-        "Buyer ID is required when seller initiates the chat"
-      );
-    }
+    if (!buyerFromBody)
+      throw new ApiError(400, "Buyer ID required when seller starts chat");
     buyerId = buyerFromBody;
   } else {
     buyerId = userId;
   }
 
   if (buyerId.toString() === sellerId.toString()) {
-    throw new ApiError(400, "Cannot create chat with yourself");
+    throw new ApiError(400, "Cannot chat with yourself");
   }
 
+  // 🔍 Find existing chat
   let chatRoom = await ChatRoom.findOne({
-    participants: { $all: [buyerId, sellerId] },
+    buyer: buyerId,
+    seller: sellerId,
     product: productId,
   });
 
   if (!chatRoom) {
-    chatRoom = await ChatRoom.create({
-      participants: [buyerId, sellerId],
-      product: productId,
-    });
+    try {
+      chatRoom = await ChatRoom.create({
+        buyer: buyerId,
+        seller: sellerId,
+        product: productId,
+      });
+    } catch (error) {
+      // Gracefully handle race condition duplicate
+      if (error.code === 11000) {
+        chatRoom = await ChatRoom.findOne({
+          buyer: buyerId,
+          seller: sellerId,
+          product: productId,
+        });
+      } else {
+        throw error;
+      }
+    }
   }
 
   return res
     .status(200)
-    .json(new ApiResponse(200, { chatRoom }, "Chat created successfully"));
+    .json(new ApiResponse(200, { chatRoom }, "Chat room ready"));
 });
 
 export const sendMessage = asyncHandler(async (req, res) => {
@@ -90,12 +97,15 @@ export const getMessages = asyncHandler(async (req, res) => {
 export const getUserCharts = asyncHandler(async (req, res) => {
   const userId = req.user?._id;
 
-  const chatRooms = await ChatRoom.find({ participants: userId })
+  const chatRooms = await ChatRoom.find({
+    $or: [{ buyer: userId }, { seller: userId }],
+  })
     .populate("product", "title media price")
-    .populate("participants", "fullName profileImage")
+    .populate("buyer", "fullName profileImage")
+    .populate("seller", "fullName profileImage")
     .sort({ updatedAt: -1 });
 
   return res
     .status(200)
-    .json(new ApiResponse(200, chatRooms, "get user charts"));
+    .json(new ApiResponse(200, chatRooms, "User chat rooms fetched"));
 });

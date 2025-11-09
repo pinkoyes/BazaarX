@@ -2,30 +2,27 @@ import mongoose from "mongoose";
 
 const chatRoomSchema = new mongoose.Schema(
   {
-    participants: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        required: true,
-      },
-    ],
+    buyer: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    seller: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     product: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Product",
-      required: true, // every chat is linked to a product
+      required: true,
     },
-    lastMessage: {
-      type: String,
-      default: "",
-    },
-    lastMessageTime: {
-      type: Date,
-      default: null,
-    },
+    lastMessage: String,
+    lastMessageTime: Date,
   },
   { timestamps: true }
 );
 
-chatRoomSchema.index({ participants: 1, product: 1 }, { unique: true });
+chatRoomSchema.index({ buyer: 1, seller: 1, product: 1 }, { unique: true });
 
 export const ChatRoom = mongoose.model("ChatRoom", chatRoomSchema);
