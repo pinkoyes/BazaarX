@@ -204,6 +204,7 @@ export const CurrentUser = asyncHandler(async (req, res) => {
           fullName: user.fullName,
           email: user.email,
           phoneNumber: user.phoneNumber,
+          profileImage: user.profileImage,
           role: user.role,
         },
       },

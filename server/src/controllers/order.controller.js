@@ -99,6 +99,18 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
       order.status = "accepted";
       order.timeline.acceptedAt = new Date();
 
+      // const prodUpdate = await Product.updateOne(
+      //   { _id: order.productId, available: true },
+      //   { $set: { available: false } }
+      // );
+
+      // if (prodUpdate.modifiedCount === 0) {
+      //   throw new ApiError(
+      //     409,
+      //     "Product is no longer available (already reserved/sold)"
+      //   );
+      // }
+
       if (order.paymentInfo.provider === "online") {
         order.paymentStatus = "awaiting_payment";
 
@@ -110,6 +122,7 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
         const paymentLink = `https://yourapp.com/pay/${order._id}`;
 
         // order.paymentInfo.orderId = razorpayOrder.id;
+
         await order.save();
 
         return res.status(200).json(
