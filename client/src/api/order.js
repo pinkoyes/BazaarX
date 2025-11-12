@@ -17,5 +17,11 @@ export const fetchSellerOrders = async () => {
 
 export const updateOrderStatus = async (orderId, status) => {
   const res = await api.patch(`/order/update/${orderId}`, { status });
+  console.log(res.data);
+  return res.data?.data;
+};
+
+export const fetchOrderById = async (orderId) => {
+  const res = await api.get(`/order/${orderId}`);
   return res.data?.data;
 };

@@ -1,3 +1,4 @@
+import React from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 import { fetchSellerOrders, updateOrderStatus } from "../../api/order";
@@ -14,10 +15,10 @@ import {
   FiMessageSquare,
   FiClock,
   FiTruck,
+  FiAlertTriangle,
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 
-// ✅ Helper functions for date & color logic
 const formatDate = (dateString) => {
   if (!dateString) return "N/A";
   const date = new Date(dateString);
@@ -33,17 +34,28 @@ const formatDate = (dateString) => {
 };
 
 const getStatusColor = (status) => {
+  const styles = {
+    accepted: "bg-blue-100 text-blue-700 border-blue-300",
+    rejected: "bg-rose-100 text-rose-700 border-rose-300",
+    delivered: "bg-green-100 text-green-700 border-green-300",
+    pending: "bg-amber-100 text-amber-700 border-amber-300",
+    cancelled: "bg-gray-100 text-gray-600 border-gray-300",
+  };
+  return styles[status] || "bg-gray-100 text-gray-700 border-gray-300";
+};
+
+const getStatusIcon = (status) => {
   switch (status) {
     case "accepted":
-      return "bg-emerald-500/90 text-white";
-    case "rejected":
-      return "bg-rose-500/90 text-white";
-    case "delivered":
-      return "bg-indigo-500/90 text-white";
+      return <FiCheck className="text-blue-500" />;
     case "pending":
-      return "bg-amber-400/90 text-white";
+      return <FiAlertTriangle className="text-amber-500" />;
+    case "rejected":
+      return <FiX className="text-rose-500" />;
+    case "delivered":
+      return <FiTruck className="text-green-600" />;
     default:
-      return "bg-gray-400/80 text-white";
+      return <FiClock className="text-gray-500" />;
   }
 };
 
@@ -60,10 +72,9 @@ const SellerRequests = () => {
   } = useQuery({
     queryKey: ["sellerRequests"],
     queryFn: fetchSellerOrders,
-    staleTime: 0,
   });
 
-  // === Accept / Reject Mutation ===
+  // === Accept / Reject Order ===
   const mutation = useMutation({
     mutationFn: ({ orderId, status }) => updateOrderStatus(orderId, status),
     onSuccess: () => {
@@ -71,56 +82,55 @@ const SellerRequests = () => {
       queryClient.invalidateQueries(["sellerRequests"]);
     },
     onError: (err) =>
-      toast.error(
-        err?.response?.data?.message || "Failed to update order status!"
-      ),
+      toast.error(err?.response?.data?.message || "Failed to update order!"),
   });
 
-  // === Chat with Buyer Mutation ===
+  // === Chat with Buyer ===
   const chatMutation = useMutation({
     mutationFn: ({ productId, buyerId }) =>
       initiateChatRoom({ productId, buyerId }),
     onSuccess: (data) => {
       if (data?.chatRoom?._id) {
         navigate(`/chat/${data.chatRoom._id}`);
-        toast.success("Chat started successfully!");
-      } else {
-        toast.error("Unexpected server response.");
-      }
+        toast.success("Chat started with buyer!");
+      } else toast.error("Unexpected response from server");
     },
-    onError: (error) => {
+    onError: (error) =>
       toast.error(
         error?.response?.data?.message || "Failed to start chat with buyer."
-      );
-    },
+      ),
   });
 
-  // === Loading & Empty States ===
+  // === Loading States ===
   if (isLoading)
     return (
-      <div className="flex justify-center items-center min-h-screen text-gray-500 text-lg">
-        Loading requests...
+      <div className="flex justify-center items-center min-h-[60vh] text-indigo-600">
+        <div className="animate-spin h-10 w-10 border-4 border-gray-300 border-t-indigo-600 rounded-full"></div>
       </div>
     );
 
   if (isError)
     return (
-      <div className="flex justify-center items-center min-h-screen text-red-500 text-lg">
+      <div className="flex justify-center items-center min-h-[60vh] text-red-500 text-lg">
         Error: {error.message}
       </div>
     );
 
   if (!orders || orders.length === 0)
     return (
-      <div className="flex justify-center items-center min-h-screen text-gray-500 text-lg">
-        No customer requests found.
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-gray-600 text-center">
+        <FiPackage className="text-6xl mb-4 text-gray-400" />
+        <h2 className="text-xl font-semibold">No customer requests found.</h2>
+        <p className="text-sm text-gray-500 mt-1">
+          You currently have no new orders.
+        </p>
       </div>
     );
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-indigo-50 via-white to-violet-100 py-14 px-6 font-sans">
+    <div className="min-h-screen bg-linear-to-br from-gray-50 via-white to-indigo-50 py-14 px-6 font-sans">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-extrabold text-center text-gray-900 mb-14 tracking-tight">
+        <h1 className="text-4xl font-extrabold text-center text-gray-900 mb-14">
           🧾 Customer Order Requests
         </h1>
 
@@ -132,91 +142,85 @@ const SellerRequests = () => {
             return (
               <div
                 key={order._id}
-                className="group relative bg-white/70 backdrop-blur-xl border border-gray-200 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 p-6 flex flex-col"
+                className="relative bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 p-6 flex flex-col"
               >
-                {/* === Floating Status Badge === */}
-                <span
-                  className={`absolute top-4 z-40 right-4 px-3 py-1 rounded-full text-xs font-semibold capitalize shadow-sm ${getStatusColor(
+                {/* Floating Status */}
+                <div
+                  className={`absolute top-4 z-40 right-4 px-3 py-1.5 rounded-full text-xs font-semibold capitalize shadow-sm flex items-center gap-1 border ${getStatusColor(
                     order.status
                   )}`}
                 >
-                  {order.status}
-                </span>
+                  {getStatusIcon(order.status)} {order.status}
+                </div>
 
-                {/* === Product Image === */}
-                <div className="overflow-hidden rounded-2xl mb-5">
+                {/* Product Image */}
+                <div
+                  className="overflow-hidden rounded-2xl mb-5 cursor-pointer"
+                  onClick={() =>
+                    window.open(`/product/${product._id}`, "_blank")
+                  }
+                >
                   <img
                     src={
                       product.media?.[0]?.url ||
                       "https://via.placeholder.com/400x250?text=No+Image"
                     }
                     alt={product.title}
-                    className="w-full h-52 object-cover transform group-hover:scale-105 transition-all duration-300"
+                    className="w-full h-52 object-cover transform hover:scale-105 transition-all duration-500"
                   />
                 </div>
 
-                {/* === Product Details === */}
-                <div className="flex flex-col justify-between flex-1">
-                  <div>
-                    <h3 className="text-xl font-semibold text-gray-900 flex items-center gap-2 mb-2">
-                      <FiPackage className="text-indigo-500" />
-                      {product.title || "Untitled Product"}
-                    </h3>
-                    <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-                      {product.description || "No description available."}
-                    </p>
-                    <p className="text-2xl font-bold text-indigo-600">
-                      ₹{order.priceAtPurchase.toLocaleString("en-IN")}
-                    </p>
-                  </div>
+                {/* Product Info */}
+                <div className="flex flex-col flex-1">
+                  <h3 className="text-xl font-semibold text-gray-900 flex items-center gap-2 mb-2">
+                    <FiPackage className="text-indigo-500" />
+                    {product.title || "Untitled Product"}
+                  </h3>
+                  <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                    {product.description || "No description available."}
+                  </p>
+                  <p className="text-2xl font-bold text-indigo-600 mb-4">
+                    ₹{order.priceAtPurchase.toLocaleString("en-IN")}
+                  </p>
 
-                  {/* === Buyer Info Card === */}
-                  <div className="bg-slate-50/80 mt-6 rounded-2xl p-4 shadow-inner space-y-2">
-                    <div className="flex items-center gap-2 text-gray-700">
-                      <FiUser className="text-gray-500" />
-                      <span className="font-medium">
-                        {buyer.fullName || "Unknown Buyer"}
-                      </span>
-                    </div>
-
+                  {/* Buyer Info */}
+                  <div className="bg-slate-50 rounded-2xl p-4 shadow-inner mb-4 space-y-2 text-sm text-gray-700">
+                    <p className="flex items-center gap-2">
+                      <FiUser className="text-indigo-500" />
+                      <strong>{buyer.fullName || "Unknown Buyer"}</strong>
+                    </p>
                     {buyer.email && (
-                      <div className="flex items-center gap-2 text-gray-700">
-                        <FiMail className="text-gray-500" />
-                        <span>{buyer.email}</span>
-                      </div>
+                      <p className="flex items-center gap-2">
+                        <FiMail className="text-indigo-500" />
+                        {buyer.email}
+                      </p>
                     )}
-
                     {buyer.phoneNumber && (
-                      <div className="flex items-center gap-2 text-gray-700">
-                        <FiPhone className="text-gray-500" />
-                        <span>{buyer.phoneNumber}</span>
-                      </div>
+                      <p className="flex items-center gap-2">
+                        <FiPhone className="text-indigo-500" />
+                        {buyer.phoneNumber}
+                      </p>
                     )}
-
-                    <div className="flex items-center gap-2 text-gray-700">
-                      <FiCreditCard className="text-gray-500" />
+                    <p className="flex items-center gap-2">
+                      <FiCreditCard className="text-indigo-500" />
                       <span className="capitalize">
                         {order.paymentInfo?.provider || "N/A"} (
                         {order.paymentStatus})
                       </span>
-                    </div>
-
-                    <div className="flex items-start gap-2 text-gray-700">
-                      <FiMapPin className="text-gray-500 mt-0.5" />
-                      <span className="text-gray-600 text-sm">
+                    </p>
+                    <p className="flex items-start gap-2">
+                      <FiMapPin className="text-indigo-500 mt-0.5" />
+                      <span>
                         {order.deliveryAddress
                           ? `${order.deliveryAddress.street}, ${order.deliveryAddress.city}, ${order.deliveryAddress.state} - ${order.deliveryAddress.pincode}`
                           : "Address not provided"}
                       </span>
-                    </div>
+                    </p>
                   </div>
 
-                  {/* === Timeline Info === */}
-                  <div className="mt-4 text-xs text-gray-500 space-y-1">
-                    <p>
-                      <FiClock className="inline mr-1 text-indigo-500" />
-                      Placed: {formatDate(order.timeline?.placedAt)}
-                    </p>
+                  {/* Timeline */}
+                  <div className="text-xs text-gray-500 mb-4">
+                    <p>📦 Placed: {formatDate(order.timeline?.placedAt)}</p>
                     {order.timeline?.acceptedAt && (
                       <p>
                         ✅ Accepted: {formatDate(order.timeline?.acceptedAt)}
@@ -229,8 +233,8 @@ const SellerRequests = () => {
                     )}
                   </div>
 
-                  {/* === Action Buttons === */}
-                  <div className="mt-6 flex flex-col gap-3">
+                  {/* Action Buttons */}
+                  <div className="flex flex-col gap-3 mt-auto">
                     {order.status === "pending" ? (
                       <div className="flex gap-3">
                         <button
@@ -241,7 +245,7 @@ const SellerRequests = () => {
                               status: "accepted",
                             })
                           }
-                          className="flex-1 bg-linear-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white py-2.5 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+                          className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2.5 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
                         >
                           <FiCheck /> Accept
                         </button>
@@ -253,18 +257,17 @@ const SellerRequests = () => {
                               status: "rejected",
                             })
                           }
-                          className="flex-1 bg-linear-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white py-2.5 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+                          className="flex-1 bg-rose-600 hover:bg-rose-700 text-white py-2.5 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
                         >
                           <FiX /> Reject
                         </button>
                       </div>
                     ) : (
-                      <div className="text-sm text-gray-600 font-medium italic text-center">
+                      <p className="text-sm text-gray-600 font-medium italic text-center">
                         Status: {order.status}
-                      </div>
+                      </p>
                     )}
 
-                    {/* Chat with Buyer */}
                     <button
                       onClick={() =>
                         chatMutation.mutate({
