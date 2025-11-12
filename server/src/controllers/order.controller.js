@@ -3,7 +3,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { Product } from "../models/product.model.js";
 import { Order } from "../models/order.model.js";
-// import { razorpayInstance } from "../config/razorpay.js";
+import { razorpayInstance } from "../config/razorpay.js";
 
 export const placeOrder = asyncHandler(async (req, res) => {
   const { productId, deliveryAddress, paymentMethod } = req.body;
@@ -17,7 +17,7 @@ export const placeOrder = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Product is already sold");
   }
 
-  if (product.ownerId.toString() === buyerId.toString()) {
+  if (product.ownerId._id.toString() === buyerId.toString()) {
     throw new ApiError(400, "You cannot buy your own product");
   }
 
@@ -80,7 +80,10 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
   const { status } = req.body;
   const sellerId = req.user._id;
 
-  const order = await Order.findById(orderId);
+  const order = await Order.findById(orderId).populate(
+    "buyerId",
+    "fullName email phoneNumber"
+  );
   if (!order) throw new ApiError(404, "Order not found");
 
   if (
@@ -99,30 +102,23 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
       order.status = "accepted";
       order.timeline.acceptedAt = new Date();
 
-      // const prodUpdate = await Product.updateOne(
-      //   { _id: order.productId, available: true },
-      //   { $set: { available: false } }
-      // );
-
-      // if (prodUpdate.modifiedCount === 0) {
-      //   throw new ApiError(
-      //     409,
-      //     "Product is no longer available (already reserved/sold)"
-      //   );
-      // }
-
       if (order.paymentInfo.provider === "online") {
         order.paymentStatus = "awaiting_payment";
 
-        // const razorpayOrder = await razorpayInstance.orders.create({
-        //   amount: order.priceAtPurchase,
-        //   currency: "INR",
-        //   receipt: `order_${order._id}`,
-        // });
-        const paymentLink = `https://yourapp.com/pay/${order._id}`;
+        const amountInPaise = Math.round(order.priceAtPurchase);
 
-        // order.paymentInfo.orderId = razorpayOrder.id;
+        const razorpayOrder = await razorpayInstance.orders.create({
+          amount: amountInPaise,
+          currency: "INR",
+          receipt: `order_rcptid_${order._id}`,
+          notes: {
+            product: order.productId?.toString() || "N/A",
+            buyer: order.buyerId.fullName,
+          },
+        });
 
+        order.paymentInfo.orderId = razorpayOrder.id;
+        order.paymentInfo.provider = "online";
         await order.save();
 
         return res.status(200).json(
@@ -130,13 +126,15 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
             200,
             {
               order,
-              paymentLink,
+              razorpayOrder,
             },
-            "Order accepted — awaiting online payment from buyer"
+            "Order accepted — Razorpay Order created for buyer"
           )
         );
-      } else {
-        // cod logic
+      }
+
+      // 💵 COD Case
+      else {
         order.paymentStatus = "unpaid";
         await order.save();
         return res
@@ -150,8 +148,8 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
           );
       }
     }
+
     case "rejected": {
-      // --- SELLER REJECT ORDER ---
       order.status = "rejected";
       order.paymentStatus = "failed";
       order.timeline.cancelledAt = new Date();
@@ -164,4 +162,19 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
     default:
       throw new ApiError(400, "Invalid order status update");
   }
+});
+
+export const getOrderById = asyncHandler(async (req, res) => {
+  const { orderId } = req.params;
+
+  const order = await Order.findById(orderId)
+    .populate("productId")
+    .populate("buyerId", "fullName email")
+    .populate("sellerId", "fullName email");
+
+  if (!order) throw new ApiError(404, "Order not found");
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, order, "Fetched order successfully"));
 });
