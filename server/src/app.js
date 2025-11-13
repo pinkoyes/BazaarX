@@ -3,8 +3,13 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import { ApiError } from "./utils/ApiError.js";
 
+const allowedOrigins = [
+  process.env.CLIENT_ORIGIN_LOCAL,
+  process.env.CLIENT_ORIGIN_PROD,
+];
+
 const corsOptions = {
-  origin: process.env.CLIENT_ORIGIN,
+  origin: allowedOrigins,
   credentials: true,
 };
 
