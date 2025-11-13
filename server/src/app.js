@@ -21,7 +21,6 @@ app.use(cors(corsOptions));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(cookieParser());
-app.options("/*", cors(corsOptions));
 
 import authRouter from "./routes/auth.route.js";
 import productRouter from "./routes/product.route.js";
