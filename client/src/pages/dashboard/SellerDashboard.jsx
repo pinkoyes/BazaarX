@@ -15,11 +15,10 @@ import { useAuth } from "../../context/AuthContext";
 
 const SellerDashboard = () => {
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const { user, initializing } = useAuth();
 
   const fetchProductsData = async () => {
-    setLoading(true);
     try {
       const data = await fetchUserProducts(user?._id);
       setProducts(data);
@@ -33,8 +32,11 @@ const SellerDashboard = () => {
   };
 
   useEffect(() => {
-    if (user?._id) fetchProductsData();
-  }, [user]);
+    // Fetch only when auth is ready AND user available
+    if (!initializing && user?._id) {
+      fetchProductsData();
+    }
+  }, [initializing, user]);
 
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this product?"))
@@ -42,16 +44,17 @@ const SellerDashboard = () => {
     try {
       await deleteProductById(id);
       toast.success("Product deleted successfully!");
-      setProducts(products.filter((p) => p._id !== id));
+      setProducts((prev) => prev.filter((p) => p._id !== id));
     } catch (error) {
       console.error(error);
       toast.error("Failed to delete product!");
     }
   };
 
+  // Loader UI
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-50">
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
@@ -135,7 +138,7 @@ const SellerDashboard = () => {
   );
 };
 
-// === Reusable UI Components ===
+// === UI Components ===
 
 const MetricCard = ({ title, value, icon, accent }) => (
   <div
