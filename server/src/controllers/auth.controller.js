@@ -71,7 +71,7 @@ export const googleAuth = asyncHandler(async (req, res) => {
             authProvider: user.authProvider,
           },
         },
-        isNewUser ? "User created successfully" : "Login successfully!"
+        isNewUser ? "Account created successfully." : "Login successful."
       )
     );
 });
@@ -84,7 +84,11 @@ export const RegisterUser = asyncHandler(async (req, res) => {
       message: issue.message,
     }));
     console.log(errors);
-    throw new ApiError(400, "Validation Error", errors);
+    throw new ApiError(
+      400,
+      "Validation failed. Please check your input.",
+      errors
+    );
   }
 
   const { fullName, email, phoneNumber, password } = parseData.data;
@@ -96,7 +100,7 @@ export const RegisterUser = asyncHandler(async (req, res) => {
   const existingUser = await User.findOne(query);
 
   if (existingUser) {
-    throw new ApiError(409, "User already exist!");
+    throw new ApiError(409, "User already exists.");
   }
 
   const newUser = await User.create({ fullName, email, phoneNumber, password });
@@ -121,7 +125,7 @@ export const RegisterUser = asyncHandler(async (req, res) => {
           },
           token,
         },
-        "User created successfully!"
+        "Registration successful."
       )
     );
 });
@@ -135,7 +139,11 @@ export const LoginUser = asyncHandler(async (req, res) => {
       message: issue.message,
     }));
     console.log(errors);
-    throw new ApiError(400, "Validation Error", errors);
+    throw new ApiError(
+      400,
+      "Validation failed. Please check your input.",
+      errors
+    );
   }
 
   const { email, phoneNumber, password } = parseData.data;
@@ -147,13 +155,13 @@ export const LoginUser = asyncHandler(async (req, res) => {
   const userExist = await User.findOne(query).select("+password");
 
   if (!userExist) {
-    throw new ApiError(404, "User not exist with given credentials");
+    throw new ApiError(404, "User not found.");
   }
 
   const isPasswordCorrect = await userExist.comparePassword(password);
 
   if (!isPasswordCorrect) {
-    throw new ApiError(400, "Invalid password");
+    throw new ApiError(400, "Incorrect password.");
   }
 
   const token = userExist.generateToken();
@@ -176,7 +184,7 @@ export const LoginUser = asyncHandler(async (req, res) => {
           },
           token,
         },
-        "User login successfully!"
+        "Login successful."
       )
     );
 });
@@ -185,7 +193,7 @@ export const LogoutUser = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .clearCookie("token", { ...cookieOptions, maxAge: 0 })
-    .json(new ApiResponse(200, {}, "Logout successfully!"));
+    .json(new ApiResponse(200, {}, "Logout successful."));
 });
 
 export const CurrentUser = asyncHandler(async (req, res) => {
@@ -208,7 +216,7 @@ export const CurrentUser = asyncHandler(async (req, res) => {
           role: user.role,
         },
       },
-      "Fetch current user!"
+      "User data retrieved."
     )
   );
 });

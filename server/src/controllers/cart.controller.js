@@ -11,7 +11,7 @@ export const addToCart = asyncHandler(async (req, res) => {
   const product = await Product.findById(productId);
 
   if (!product) {
-    throw new ApiError(400, "Product not found");
+    throw new ApiError(400, "Product not found.");
   }
 
   let cart = await Cart.findOne({ userId });
@@ -36,9 +36,7 @@ export const addToCart = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(
-      new ApiResponse(200, populateCart, "Product added to cart successfully!")
-    );
+    .json(new ApiResponse(200, populateCart, "Added to cart."));
 });
 
 export const myCart = asyncHandler(async (req, res) => {
@@ -50,7 +48,7 @@ export const myCart = asyncHandler(async (req, res) => {
     cart = await Cart.create({ userId, items: [] });
   }
 
-  return res.status(200).json(new ApiResponse(200, cart, "Fetch all carts"));
+  return res.status(200).json(new ApiResponse(200, cart, "Cart loaded."));
 });
 
 export const removeCart = asyncHandler(async (req, res) => {

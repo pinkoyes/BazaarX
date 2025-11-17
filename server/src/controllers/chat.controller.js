@@ -9,24 +9,23 @@ export const createOrGetChatRoom = asyncHandler(async (req, res) => {
   const { productId, buyerId: buyerFromBody } = req.body;
   const userId = req.user?._id;
 
-  if (!productId) throw new ApiError(400, "Product ID is required");
+  if (!productId) throw new ApiError(400, "Product ID is required.");
 
   const product = await Product.findById(productId);
-  if (!product) throw new ApiError(404, "Product not found");
+  if (!product) throw new ApiError(404, "Product not found.");
 
   const sellerId = product.ownerId;
   let buyerId;
 
   if (userId.toString() === sellerId.toString()) {
-    if (!buyerFromBody)
-      throw new ApiError(400, "Buyer ID required when seller starts chat");
+    if (!buyerFromBody) throw new ApiError(400, "Buyer ID is required.");
     buyerId = buyerFromBody;
   } else {
     buyerId = userId;
   }
 
   if (buyerId.toString() === sellerId.toString()) {
-    throw new ApiError(400, "Cannot chat with yourself");
+    throw new ApiError(400, "Cannot create a chat with yourself.");
   }
 
   // 🔍 Find existing chat
@@ -59,7 +58,7 @@ export const createOrGetChatRoom = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, { chatRoom }, "Chat room ready"));
+    .json(new ApiResponse(200, { chatRoom }, "Chat room ready."));
 });
 
 export const sendMessage = asyncHandler(async (req, res) => {
@@ -77,9 +76,7 @@ export const sendMessage = asyncHandler(async (req, res) => {
     lastMessageTime: new Date(),
   });
 
-  return res
-    .status(200)
-    .json(new ApiResponse(200, message, "Message created successfully!"));
+  return res.status(200).json(new ApiResponse(200, message, "Message sent."));
 });
 
 export const getMessages = asyncHandler(async (req, res) => {
@@ -91,7 +88,7 @@ export const getMessages = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, messages, "get all messages"));
+    .json(new ApiResponse(200, messages, "Messages retrieved."));
 });
 
 export const getUserCharts = asyncHandler(async (req, res) => {
@@ -107,5 +104,5 @@ export const getUserCharts = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, chatRooms, "User chat rooms fetched"));
+    .json(new ApiResponse(200, chatRooms, "Chat rooms retrieved."));
 });
